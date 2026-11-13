@@ -1,0 +1,8 @@
+{
+  "name": "tamweel-shares",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Tamweel Shares - crowdfunding with shares, wallet and income payouts",
+  "engines": { "node": ">=22.5" },
+  "scripts": { "start": "node server.js", "dev": "SEED_DEMO=1 node server.js" }
+}
