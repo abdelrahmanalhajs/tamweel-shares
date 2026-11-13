@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تمويل شيرز | Tamweel Shares</title>
+<style>
+:root{--g:#0f766e;--g2:#14b8a6;--ink:#0f172a;--mut:#64748b;--bg:#f6f8f9;--card:#fff;--line:#e2e8f0;--r:14px}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Tahoma,system-ui,-apple-system,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+a{color:var(--g);text-decoration:none}
+header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.bar{max-width:1080px;margin:auto;padding:12px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.logo{font-weight:800;font-size:1.25rem;color:var(--g);margin-inline-end:auto}
+.logo span{color:var(--ink)}
+main{max-width:1080px;margin:auto;padding:20px 16px 60px}
+.btn{display:inline-block;border:0;background:var(--g);color:#fff;padding:10px 18px;border-radius:10px;font:inherit;font-size:.95rem;font-weight:600;cursor:pointer}
+.btn:hover{background:#0b5f58}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--g);border:1.5px solid var(--g)}
+.btn.sm{padding:6px 12px;font-size:.85rem}
+.hero{background:linear-gradient(135deg,var(--g),var(--g2));color:#fff;border-radius:20px;padding:36px 24px;margin-bottom:24px}
+.hero h1{margin:0 0 8px;font-size:2rem}
+.hero p{margin:0 0 18px;opacity:.95;max-width:560px}
+.hero .btn{background:#fff;color:var(--g)}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:28px}
+.step{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.step b{display:block;color:var(--g)}
+h2{margin:24px 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.card h3{margin:4px 0 6px}
+.tag{display:inline-block;background:#ccfbf1;color:var(--g);font-size:.75rem;font-weight:700;padding:2px 10px;border-radius:99px}
+.mut{color:var(--mut);font-size:.9rem}
+.prog{height:9px;background:#e6ecef;border-radius:9px;overflow:hidden;margin:12px 0 6px}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--g),var(--g2))}
+.row{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.stat small{color:var(--mut);display:block}
+.stat b{font-size:1.5rem}
+form.f{display:grid;gap:12px;max-width:420px}
+label{font-size:.85rem;font-weight:600;display:grid;gap:4px}
+input,select,textarea{font:inherit;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fff;width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--g2);border-color:var(--g2)}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{text-align:start;padding:9px 8px;border-bottom:1px solid var(--line)}
+th{color:var(--mut);font-weight:600;font-size:.8rem}
+.tw{overflow-x:auto}
+.msg{padding:10px 14px;border-radius:10px;margin:10px 0;background:#ecfdf5;color:#065f46}
+.msg.err{background:#fef2f2;color:#991b1b}
+.two{display:grid;grid-template-columns:1.4fr 1fr;gap:18px}
+@media(max-width:760px){.two{grid-template-columns:1fr}.hero h1{font-size:1.6rem}}
+.seg{display:flex;gap:8px}
+.seg label{flex:1;border:1.5px solid var(--line);border-radius:10px;padding:10px;text-align:center;cursor:pointer;font-weight:600}
+.seg input{display:none}
+.seg label:has(input:checked){border-color:var(--g);background:#ccfbf1;color:var(--g)}
+.pos{color:#047857;font-weight:700}
+</style>
+</head>
+<body>
+<header><div class="bar" id="nav"></div></header>
+<main id="app"></main>
+
+<script>
+/* ---------- language (default Arabic) ---------- */
+let lang='ar';
+try{lang=localStorage.getItem('tw_lang')||'ar'}catch(e){}
+const T={
+ projects:{ar:'المشاريع',en:'Projects'},
+ dash:{ar:'لوحتي',en:'My dashboard'},
+ owner:{ar:'صاحب مشروع',en:'Owner'},
+ investor:{ar:'مستثمر',en:'Investor'},
+ login:{ar:'تسجيل الدخول',en:'Log in'},
+ signup:{ar:'إنشاء حساب',en:'Sign up'},
+ logout:{ar:'تسجيل الخروج',en:'Log out'},
+ langBtn:{ar:'English',en:'العربية'},
+ heroH:{ar:'امتلك حصة في مشاريع تؤمن بها',en:'Own a share in projects you believe in'},
+ heroP:{ar:'موّل مشاريع حقيقية، واحصل على أسهم، واستلم نصيبك من الدخل. بسيط وشفاف وكل شيء في مكان واحد.',en:'Fund real projects, receive shares, and get your part of the income. Simple, transparent, tracked in one place.'},
+ start:{ar:'ابدأ الآن',en:'Get started'},
+ s1:{ar:'١. اختر مشروعًا',en:'1. Pick a project'},s1d:{ar:'تصفح المشاريع التي تبحث عن تمويل.',en:'Browse projects looking for funding.'},
+ s2:{ar:'٢. اشترِ أسهمًا',en:'2. Buy shares'},s2d:{ar:'حدد عدد الأسهم التي تريدها.',en:'Choose how many shares you want.'},
+ s3:{ar:'٣. اكسب دخلًا',en:'3. Earn income'},s3d:{ar:'استلم نصيبك عندما يحقق المشروع أرباحًا.',en:'Get paid your part when the project earns.'},
+ open:{ar:'المشاريع المفتوحة',en:'Open projects'},
+ none:{ar:'لا توجد مشاريع بعد.',en:'No projects yet.'},
+ of:{ar:'من',en:'of'},
+ perShare:{ar:'للسهم',en:'/ share'},
+ left:{ar:'سهم متبقٍ',en:'shares left'},
+ viewInvest:{ar:'عرض واستثمار',en:'View & invest'},
+ notFound:{ar:'المشروع غير موجود.',en:'Project not found.'},
+ needLogin:{ar:'سجّل الدخول كمستثمر لشراء الأسهم.',en:'Log in as an investor to buy shares.'},
+ ownerNote:{ar:'أنت مسجل كصاحب مشروع. استخدم حساب مستثمر لشراء الأسهم.',en:'You are logged in as a project owner. Use an investor account to buy shares.'},
+ openDash:{ar:'افتح لوحتي',en:'Open my dashboard'},
+ funded:{ar:'تم اكتمال التمويل 🎉',en:'Fully funded 🎉'},
+ youHold:{ar:'أنت تملك حاليًا',en:'You already hold'},
+ sharesW:{ar:'سهم',en:'shares'},
+ buyH:{ar:'اشترِ أسهمًا',en:'Buy shares'},
+ qty:{ar:'عدد الأسهم (الحد الأقصى',en:'Number of shares (max'},
+ total:{ar:'التكلفة الإجمالية',en:'Total cost'},
+ confirm:{ar:'تأكيد الاستثمار',en:'Confirm investment'},
+ demo:{ar:'نسخة تجريبية: لا يتم سحب أي مبلغ حقيقي.',en:'Demo mode: no real payment is taken.'},
+ back:{ar:'→ كل المشاريع',en:'← All projects'},
+ backB:{ar:'→ رجوع',en:'← Back'},
+ by:{ar:'بواسطة',en:'By'},listed:{ar:'نُشر في',en:'listed'},
+ raised:{ar:'المبلغ المجمّع',en:'Raised'},goal:{ar:'الهدف',en:'Goal'},
+ sharePrice:{ar:'سعر السهم',en:'Share price'},sharesLeft:{ar:'الأسهم المتبقية',en:'Shares left'},
+ badQty:{ar:'عدد الأسهم غير صحيح.',en:'Invalid number of shares.'},
+ bought:{ar:'تم! اشتريت %1 سهمًا بمبلغ %2.',en:'Done! You bought %1 shares for %2.'},
+ createAcc:{ar:'إنشاء حساب',en:'Create account'},
+ wantInvest:{ar:'أريد الاستثمار',en:'I want to invest'},ownProject:{ar:'أملك مشروعًا',en:'I own a project'},
+ fullName:{ar:'الاسم الكامل',en:'Full name'},email:{ar:'البريد الإلكتروني',en:'Email'},pass:{ar:'كلمة المرور',en:'Password'},
+ haveAcc:{ar:'لديك حساب؟',en:'Have an account?'},newHere:{ar:'مستخدم جديد؟',en:'New here?'},
+ demoHint:{ar:'تجريبي: investor@demo.com أو owner@demo.com · كلمة المرور demo123',en:'Demo: investor@demo.com or owner@demo.com · password demo123'},
+ emailUsed:{ar:'البريد الإلكتروني مسجل مسبقًا.',en:'Email already registered.'},
+ wrong:{ar:'البريد أو كلمة المرور غير صحيحة.',en:'Wrong email or password.'},
+ hello:{ar:'مرحبًا،',en:'Hello,'},
+ invested:{ar:'إجمالي الاستثمار',en:'Total invested'},income:{ar:'الدخل المستلم',en:'Income received'},
+ projCount:{ar:'المشاريع',en:'Projects'},ret:{ar:'العائد حتى الآن',en:'Return so far'},
+ myShares:{ar:'أسهمي',en:'My shares'},project:{ar:'المشروع',en:'Project'},shares:{ar:'الأسهم',en:'Shares'},
+ ownership:{ar:'نسبة الملكية',en:'Ownership'},investedCol:{ar:'المستثمر',en:'Invested'},incomeCol:{ar:'الدخل',en:'Income'},
+ noShares:{ar:'ليس لديك أسهم بعد.',en:'You have no shares yet.'},browse:{ar:'تصفح المشاريع',en:'Browse projects'},
+ hist:{ar:'سجل الدخل',en:'Income history'},date:{ar:'التاريخ',en:'Date'},note:{ar:'ملاحظة',en:'Note'},received:{ar:'استلمت',en:'You received'},
+ noIncome:{ar:'لا يوجد دخل بعد.',en:'No income yet.'},
+ ownerDash:{ar:'لوحة صاحب المشروع',en:'Owner dashboard'},totalRaised:{ar:'إجمالي التمويل',en:'Total funds raised'},
+ investors:{ar:'المستثمرون',en:'Investors'},paidOut:{ar:'الدخل الموزّع',en:'Income paid out'},myProjects:{ar:'مشاريعي',en:'My projects'},
+ newProj:{ar:'+ مشروع جديد',en:'+ New project'},noOwn:{ar:'ليس لديك مشاريع بعد. أنشئ مشروعك الأول.',en:'You have no projects yet. Create your first one.'},
+ publicPage:{ar:'الصفحة العامة ←',en:'Public page →'},raisedLow:{ar:'تم جمعها',en:'raised'},sold:{ar:'سهم مباع',en:'shares sold'},
+ name:{ar:'الاسم',en:'Name'},amount:{ar:'المبلغ',en:'Amount'},pctCol:{ar:'النسبة',en:'Share %'},
+ noInv:{ar:'لا يوجد مستثمرون بعد.',en:'No investors yet.'},payHist:{ar:'سجل التوزيعات',en:'Payout history'},
+ shareInc:{ar:'وزّع الدخل على المستثمرين',en:'Share income with investors'},amtDist:{ar:'المبلغ المراد توزيعه ($)',en:'Amount to distribute ($)'},
+ notePh:{ar:'مثال: أرباح أكتوبر',en:'e.g. October profit'},distBtn:{ar:'وزّع حسب الأسهم',en:'Distribute by shares'},
+ distNote:{ar:'يُقسَّم المبلغ تلقائيًا بين جميع المساهمين حسب عدد أسهمهم.',en:'Split automatically between all shareholders, based on shares held.'},
+ incomeDef:{ar:'دخل',en:'Income'},distDone:{ar:'تم توزيع %1 على %2 مستثمر.',en:'%1 distributed to %2 investor(s).'},
+ newH:{ar:'مشروع جديد',en:'New project'},pname:{ar:'اسم المشروع',en:'Project name'},cat:{ar:'التصنيف',en:'Category'},
+ desc:{ar:'الوصف',en:'Description'},descPh:{ar:'فيمَ سيُستخدم المال وكيف سيحقق دخلًا؟',en:'What will the money be used for and how will it earn income?'},
+ goalIn:{ar:'هدف التمويل ($)',en:'Funding goal ($)'},priceIn:{ar:'سعر السهم ($)',en:'Price per share ($)'},
+ publish:{ar:'نشر المشروع',en:'Publish project'},published:{ar:'تم نشر المشروع!',en:'Project published!'},
+ priceErr:{ar:'سعر السهم لا يمكن أن يتجاوز الهدف.',en:'Share price cannot exceed the goal.'},
+ calc:{ar:'= %1 سهم متاح للمستثمرين.',en:'= %1 shares available for investors.'},
+ c_agri:{ar:'زراعة',en:'Agriculture'},c_food:{ar:'أغذية ومشروبات',en:'Food & Drink'},c_energy:{ar:'طاقة',en:'Energy'},
+ c_real:{ar:'عقارات',en:'Real Estate'},c_tech:{ar:'تقنية',en:'Technology'},c_retail:{ar:'تجارة',en:'Retail'},c_other:{ar:'أخرى',en:'Other'}
+};
+function t(k,...a){let s=(T[k]||{})[lang]||k;a.forEach((v,i)=>s=s.replace('%'+(i+1),v));return s}
+const L=v=>v&&typeof v==='object'?v[lang]:v;           // bilingual (seed) or plain text
+const CATS=['agri','food','energy','real','tech','retail','other'];
+function setLang(l){lang=l;try{localStorage.setItem('tw_lang',l)}catch(e){}applyLang();render()}
+function applyLang(){document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr'}
+
+/* ---------- tiny local "database" (browser localStorage) ---------- */
+const KEY='tamweel_shares_v2';
+let db=load();
+function uid(){return Math.random().toString(36).slice(2,10)}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}}
+function load(){
+  try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.users)return d}catch(e){}
+  const o={id:'u_owner',name:{ar:'صاحب مشروع تجريبي',en:'Demo Owner'},email:'owner@demo.com',pass:'demo123',role:'owner'};
+  const i={id:'u_inv',name:{ar:'مستثمر تجريبي',en:'Demo Investor'},email:'investor@demo.com',pass:'demo123',role:'investor'};
+  const d={users:[o,i],session:null,investments:[],payouts:[],projects:[
+    {id:'p1',ownerId:o.id,cat:'agri',title:{ar:'مزرعة الوادي الأخضر للزيتون',en:'Green Valley Olive Farm'},desc:{ar:'توسعة مزرعة الزيتون العائلية بمعصرة جديدة و٢٠٠٠ شجرة إضافية. يأتي الدخل من بيع زيت الزيتون الفاخر محليًا وخارجيًا.',en:'Expanding our family olive farm with a new press and 2,000 more trees. Revenue comes from selling premium olive oil locally and abroad.'},goal:50000,sharePrice:100,date:Date.now()-864e5*20},
+    {id:'p2',ownerId:o.id,cat:'food',title:{ar:'محمصة قهوة المدينة',en:'City Coffee Roastery'},desc:{ar:'محمصة قهوة تزوّد ٣٠ مقهى في الحي. تُستخدم الأموال لشراء آلة تحميص ثانية وخط تغليف.',en:'A neighbourhood coffee roastery supplying 30 cafés. Funds go to a second roasting machine and packaging line.'},goal:30000,sharePrice:50,date:Date.now()-864e5*9},
+    {id:'p3',ownerId:o.id,cat:'energy',title:{ar:'ألواح شمسية لمدرسة النور',en:'Solar Panels for Al-Noor School'},desc:{ar:'تركيب ألواح شمسية على السطح وبيع فائض الكهرباء للشبكة. يُوزَّع الدخل من مبيعات الطاقة الشهرية.',en:'Install rooftop solar and sell surplus power to the grid. Income is shared from monthly energy sales.'},goal:80000,sharePrice:200,date:Date.now()-864e5*3}
+  ]};
+  d.investments.push({id:uid(),projectId:'p1',userId:i.id,shares:120,date:Date.now()-864e5*15});
+  d.investments.push({id:uid(),projectId:'p2',userId:i.id,shares:80,date:Date.now()-864e5*5});
+  d.payouts.push({id:uid(),projectId:'p1',amount:1200,note:{ar:'مبيعات الزيت للربع الثالث',en:'Q3 oil sales'},date:Date.now()-864e5*4,splits:{[i.id]:1200}});
+  try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){}return d;
+}
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const loc=()=>lang==='ar'?'ar-EG':'en-US';
+const num=n=>Number(n||0).toLocaleString(loc(),{maximumFractionDigits:2});
+const money=n=>(lang==='ar'?'':'$')+num(n)+(lang==='ar'?' $':'');
+const fdate=t=>new Date(t).toLocaleDateString(loc());
+const me=()=>db.users.find(u=>u.id===db.session);
+const proj=id=>db.projects.find(p=>p.id===id);
+const totalShares=p=>Math.round(p.goal/p.sharePrice);
+const sold=p=>db.investments.filter(x=>x.projectId===p.id).reduce((a,x)=>a+x.shares,0);
+const raised=p=>sold(p)*p.sharePrice;
+const pct=p=>Math.min(100,Math.round(sold(p)/totalShares(p)*100));
+const sharesOf=(p,uid)=>db.investments.filter(x=>x.projectId===p.id&&x.userId===uid).reduce((a,x)=>a+x.shares,0);
+const incomeOf=(p,uid)=>db.payouts.filter(x=>x.projectId===p.id).reduce((a,x)=>a+(x.splits[uid]||0),0);
+const catName=p=>t('c_'+p.cat);
+let flash='';
+function msg(s,err){flash=`<div class="msg ${err?'err':''}">${esc(s)}</div>`}
+function go(h){location.hash=h}
+
+/* ---------- nav ---------- */
+function nav(){
+  const u=me();
+  $('#nav').innerHTML=`<a class="logo" href="#/">${lang==='ar'?'تمويل <span>شيرز</span>':'Tamweel <span>Shares</span>'}</a>
+   <a href="#/">${t('projects')}</a>`+(u?
+   `<a href="#/dashboard">${t('dash')}</a><span class="mut">${esc(L(u.name))} · ${t(u.role==='owner'?'owner':'investor')}</span><button class="btn ghost sm" onclick="logout()">${t('logout')}</button>`:
+   `<a href="#/login">${t('login')}</a><a class="btn sm" href="#/signup">${t('signup')}</a>`)+
+   `<button class="btn ghost sm" onclick="setLang('${lang==='ar'?'en':'ar'}')">${t('langBtn')}</button>`;
+}
+function logout(){db.session=null;save();go('#/')}
+
+/* ---------- views ---------- */
+function projectCard(p){
+  const d=L(p.desc);
+  return `<div class="card"><span class="tag">${esc(catName(p))}</span><h3>${esc(L(p.title))}</h3>
+  <div class="mut">${esc(d.slice(0,90))}${d.length>90?'…':''}</div>
+  <div class="prog"><i style="width:${pct(p)}%"></i></div>
+  <div class="row"><b>${money(raised(p))}</b><span class="mut">${t('of')} ${money(p.goal)} · ${num(pct(p))}%</span></div>
+  <div class="row mut" style="margin:6px 0 12px"><span>${money(p.sharePrice)} ${t('perShare')}</span><span>${num(totalShares(p)-sold(p))} ${t('left')}</span></div>
+  <a class="btn sm" href="#/project/${p.id}">${t('viewInvest')}</a></div>`;
+}
+function vHome(){
+  const u=me();
+  return `<div class="hero"><h1>${t('heroH')}</h1><p>${t('heroP')}</p>
+  ${u?'':`<a class="btn" href="#/signup">${t('start')}</a>`}</div>
+  <div class="steps"><div class="step"><b>${t('s1')}</b>${t('s1d')}</div>
+  <div class="step"><b>${t('s2')}</b>${t('s2d')}</div>
+  <div class="step"><b>${t('s3')}</b>${t('s3d')}</div></div>
+  <h2>${t('open')}</h2><div class="grid">${db.projects.slice().reverse().map(projectCard).join('')||`<p class="mut">${t('none')}</p>`}</div>`;
+}
+function vProject(id){
+  const p=proj(id);if(!p)return `<p>${t('notFound')}</p>`;
+  const u=me(),owner=db.users.find(x=>x.id===p.ownerId),left=totalShares(p)-sold(p);
+  let box;
+  if(!u)box=`<p>${t('needLogin')}</p><a class="btn" href="#/login">${t('login')}</a> <a class="btn ghost" href="#/signup">${t('signup')}</a>`;
+  else if(u.role==='owner')box=`<p class="mut">${t('ownerNote')}</p>`+(u.id===p.ownerId?`<a class="btn" href="#/dashboard">${t('openDash')}</a>`:'');
+  else if(!left)box=`<p><b>${t('funded')}</b></p>`+(sharesOf(p,u.id)?`<p class="mut">${t('youHold')} ${num(sharesOf(p,u.id))} ${t('sharesW')}.</p>`:'');
+  else box=`<h3 style="margin-top:0">${t('buyH')}</h3>
+   <form class="f" onsubmit="return buy(event,'${p.id}')">
+   <label>${t('qty')} ${left})<input type="number" id="qty" min="1" max="${left}" value="1" required oninput="$('#cost').textContent=money(this.value*${p.sharePrice})"></label>
+   <div class="row"><span>${t('total')}</span><b id="cost">${money(p.sharePrice)}</b></div>
+   <button class="btn">${t('confirm')}</button></form>
+   ${sharesOf(p,u.id)?`<p class="mut">${t('youHold')} ${num(sharesOf(p,u.id))} ${t('sharesW')}.</p>`:''}
+   <p class="mut" style="font-size:.8rem">${t('demo')}</p>`;
+  return `<p><a href="#/">${t('back')}</a></p>${flash}<div class="two"><div class="card"><span class="tag">${esc(catName(p))}</span>
+  <h1 style="margin:8px 0">${esc(L(p.title))}</h1><p class="mut">${t('by')} ${esc(L(owner?.name)||'')} · ${t('listed')} ${fdate(p.date)}</p><p>${esc(L(p.desc))}</p>
+  <div class="prog"><i style="width:${pct(p)}%"></i></div>
+  <div class="stats"><div class="stat"><small>${t('raised')}</small><b>${money(raised(p))}</b></div><div class="stat"><small>${t('goal')}</small><b>${money(p.goal)}</b></div>
+  <div class="stat"><small>${t('sharePrice')}</small><b>${money(p.sharePrice)}</b></div><div class="stat"><small>${t('sharesLeft')}</small><b>${num(left)}/${num(totalShares(p))}</b></div></div></div>
+  <div class="card">${box}</div></div>`;
+}
+function buy(e,id){
+  e.preventDefault();const p=proj(id),u=me(),q=parseInt($('#qty').value);
+  if(!(q>=1)||q>totalShares(p)-sold(p)){msg(t('badQty'),1);render();return false}
+  db.investments.push({id:uid(),projectId:id,userId:u.id,shares:q,date:Date.now()});save();
+  msg(t('bought',num(q),money(q*p.sharePrice)));render();return false;
+}
+function vAuth(mode){
+  const su=mode==='signup';
+  return `<div class="card" style="max-width:460px;margin:20px auto"><h2 style="margin-top:0">${su?t('createAcc'):t('login')}</h2>${flash}
+  <form class="f" onsubmit="return ${su?'doSignup':'doLogin'}(event)" style="max-width:none">
+  ${su?`<div class="seg"><label><input type="radio" name="role" value="investor" checked>${t('wantInvest')}</label><label><input type="radio" name="role" value="owner">${t('ownProject')}</label></div>
+  <label>${t('fullName')}<input id="name" required></label>`:''}
+  <label>${t('email')}<input id="email" type="email" required dir="ltr" style="text-align:start"></label>
+  <label>${t('pass')}<input id="pass" type="password" required minlength="6" dir="ltr" style="text-align:start"></label>
+  <button class="btn">${su?t('signup'):t('login')}</button></form>
+  <p class="mut">${su?`${t('haveAcc')} <a href="#/login">${t('login')}</a>`:`${t('newHere')} <a href="#/signup">${t('signup')}</a>`}</p>
+  ${su?'':`<p class="mut" style="font-size:.8rem">${t('demoHint')}</p>`}</div>`;
+}
+function doSignup(e){
+  e.preventDefault();const email=$('#email').value.trim().toLowerCase();
+  if(db.users.some(u=>u.email===email)){msg(t('emailUsed'),1);render();return false}
+  const u={id:uid(),name:$('#name').value.trim(),email,pass:$('#pass').value,role:document.querySelector('[name=role]:checked').value};
+  db.users.push(u);db.session=u.id;save();flash='';go('#/dashboard');return false;
+}
+function doLogin(e){
+  e.preventDefault();const email=$('#email').value.trim().toLowerCase();
+  const u=db.users.find(x=>x.email===email&&x.pass===$('#pass').value);
+  if(!u){msg(t('wrong'),1);render();return false}
+  db.session=u.id;save();flash='';go('#/dashboard');return false;
+}
+
+/* investor dashboard */
+function vInvestor(u){
+  const held=db.projects.filter(p=>sharesOf(p,u.id)>0);
+  const invested=held.reduce((a,p)=>a+sharesOf(p,u.id)*p.sharePrice,0);
+  const income=held.reduce((a,p)=>a+incomeOf(p,u.id),0);
+  const pays=[];db.payouts.forEach(x=>{if(x.splits[u.id])pays.push({...x,mine:x.splits[u.id]})});pays.sort((a,b)=>b.date-a.date);
+  return `<h1>${t('hello')} ${esc(L(u.name))}</h1>${flash}
+  <div class="stats"><div class="stat"><small>${t('invested')}</small><b>${money(invested)}</b></div>
+  <div class="stat"><small>${t('income')}</small><b class="pos">${money(income)}</b></div>
+  <div class="stat"><small>${t('projCount')}</small><b>${num(held.length)}</b></div>
+  <div class="stat"><small>${t('ret')}</small><b>${num(invested?(income/invested*100).toFixed(1):0)}%</b></div></div>
+  <h2>${t('myShares')}</h2>${held.length?`<div class="card tw"><table><tr><th>${t('project')}</th><th>${t('shares')}</th><th>${t('ownership')}</th><th>${t('investedCol')}</th><th>${t('incomeCol')}</th></tr>
+  ${held.map(p=>{const s=sharesOf(p,u.id);return `<tr><td><a href="#/project/${p.id}">${esc(L(p.title))}</a></td><td>${num(s)}</td><td>${num((s/totalShares(p)*100).toFixed(2))}%</td><td>${money(s*p.sharePrice)}</td><td class="pos">${money(incomeOf(p,u.id))}</td></tr>`}).join('')}</table></div>`:
+  `<div class="card">${t('noShares')} <a href="#/">${t('browse')}</a></div>`}
+  <h2>${t('hist')}</h2>${pays.length?`<div class="card tw"><table><tr><th>${t('date')}</th><th>${t('project')}</th><th>${t('note')}</th><th>${t('received')}</th></tr>
+  ${pays.map(x=>`<tr><td>${fdate(x.date)}</td><td>${esc(L(proj(x.projectId)?.title))}</td><td>${esc(L(x.note))}</td><td class="pos">+${money(x.mine)}</td></tr>`).join('')}</table></div>`:`<div class="card mut">${t('noIncome')}</div>`}`;
+}
+
+/* owner dashboard */
+function vOwner(u){
+  const mine=db.projects.filter(p=>p.ownerId===u.id);
+  const tot=mine.reduce((a,p)=>a+raised(p),0);
+  const inv=new Set(db.investments.filter(x=>mine.some(p=>p.id===x.projectId)).map(x=>x.userId)).size;
+  const paid=db.payouts.filter(x=>mine.some(p=>p.id===x.projectId)).reduce((a,x)=>a+x.amount,0);
+  return `<h1>${t('ownerDash')}</h1>${flash}
+  <div class="stats"><div class="stat"><small>${t('totalRaised')}</small><b>${money(tot)}</b></div><div class="stat"><small>${t('investors')}</small><b>${num(inv)}</b></div>
+  <div class="stat"><small>${t('paidOut')}</small><b>${money(paid)}</b></div><div class="stat"><small>${t('myProjects')}</small><b>${num(mine.length)}</b></div></div>
+  <div class="row"><h2 style="margin:8px 0">${t('myProjects')}</h2><a class="btn" href="#/new">${t('newProj')}</a></div>
+  ${mine.map(ownerProject).join('')||`<div class="card mut">${t('noOwn')}</div>`}`;
+}
+function ownerProject(p){
+  const rows=db.users.filter(x=>sharesOf(p,x.id)>0).map(x=>({u:x,s:sharesOf(p,x.id)})).sort((a,b)=>b.s-a.s);
+  const pays=db.payouts.filter(x=>x.projectId===p.id).sort((a,b)=>b.date-a.date);
+  return `<div class="card" style="margin-bottom:16px"><div class="row"><h3 style="margin:0">${esc(L(p.title))}</h3><a href="#/project/${p.id}">${t('publicPage')}</a></div>
+  <div class="prog"><i style="width:${pct(p)}%"></i></div>
+  <div class="row"><b>${money(raised(p))} ${t('raisedLow')}</b><span class="mut">${t('goal')} ${money(p.goal)} · ${num(sold(p))}/${num(totalShares(p))} ${t('sold')}</span></div>
+  <div class="two" style="margin-top:14px"><div><b>${t('investors')}</b>${rows.length?`<div class="tw"><table><tr><th>${t('name')}</th><th>${t('shares')}</th><th>${t('amount')}</th><th>${t('pctCol')}</th></tr>
+  ${rows.map(r=>`<tr><td>${esc(L(r.u.name))}</td><td>${num(r.s)}</td><td>${money(r.s*p.sharePrice)}</td><td>${num((r.s/sold(p)*100).toFixed(1))}%</td></tr>`).join('')}</table></div>`:`<p class="mut">${t('noInv')}</p>`}
+  ${pays.length?`<p style="margin-bottom:4px"><b>${t('payHist')}</b></p>${pays.map(x=>`<div class="row mut"><span>${fdate(x.date)} · ${esc(L(x.note))}</span><span>${money(x.amount)}</span></div>`).join('')}`:''}</div>
+  <div><b>${t('shareInc')}</b><form class="f" style="margin-top:8px" onsubmit="return payout(event,'${p.id}')">
+  <label>${t('amtDist')}<input type="number" min="1" step="0.01" name="amt" required></label>
+  <label>${t('note')}<input name="note" placeholder="${t('notePh')}"></label>
+  <button class="btn" ${sold(p)?'':'disabled'}>${t('distBtn')}</button></form>
+  <p class="mut" style="font-size:.8rem">${t('distNote')}</p></div></div></div>`;
+}
+function payout(e,id){
+  e.preventDefault();const p=proj(id),f=e.target,amt=parseFloat(f.amt.value),s=sold(p);
+  if(!s||!(amt>0)){return false}
+  const splits={};db.investments.filter(x=>x.projectId===id).forEach(x=>{splits[x.userId]=(splits[x.userId]||0)+amt*x.shares/s});
+  Object.keys(splits).forEach(k=>splits[k]=Math.round(splits[k]*100)/100);
+  db.payouts.push({id:uid(),projectId:id,amount:amt,note:f.note.value.trim()||{ar:'دخل',en:'Income'},date:Date.now(),splits});save();
+  msg(t('distDone',money(amt),num(Object.keys(splits).length)));render();return false;
+}
+function vNew(){
+  return `<p><a href="#/dashboard">${t('backB')}</a></p><div class="card" style="max-width:560px"><h2 style="margin-top:0">${t('newH')}</h2>
+  <form class="f" style="max-width:none" onsubmit="return createProject(event)">
+  <label>${t('pname')}<input name="title" required></label>
+  <label>${t('cat')}<select name="cat">${CATS.map(c=>`<option value="${c}">${t('c_'+c)}</option>`).join('')}</select></label>
+  <label>${t('desc')}<textarea name="desc" rows="4" required placeholder="${t('descPh')}"></textarea></label>
+  <label>${t('goalIn')}<input type="number" name="goal" min="100" required></label>
+  <label>${t('priceIn')}<input type="number" name="price" min="1" required></label>
+  <p class="mut" id="calc"></p><button class="btn">${t('publish')}</button></form></div>`;
+}
+function createProject(e){
+  e.preventDefault();const f=e.target,goal=+f.goal.value,price=+f.price.value;
+  if(price>goal){alert(t('priceErr'));return false}
+  const p={id:uid(),ownerId:me().id,title:f.title.value.trim(),cat:f.cat.value,desc:f.desc.value.trim(),goal:Math.round(goal/price)*price,sharePrice:price,date:Date.now()};
+  db.projects.push(p);save();msg(t('published'));go('#/dashboard');return false;
+}
+document.addEventListener('input',e=>{
+  const f=e.target.form;if(f&&f.goal&&f.price&&$('#calc')){const g=+f.goal.value,p=+f.price.value;
+   $('#calc').textContent=g&&p?t('calc',num(Math.round(g/p))):''}
+});
+
+/* ---------- router ---------- */
+function render(){
+  nav();const h=location.hash||'#/',u=me();let html;
+  if(h.startsWith('#/project/'))html=vProject(h.split('/')[2]);
+  else if(h==='#/login')html=vAuth('login');
+  else if(h==='#/signup')html=vAuth('signup');
+  else if(h==='#/dashboard')html=!u?(go('#/login'),''):u.role==='owner'?vOwner(u):vInvestor(u);
+  else if(h==='#/new')html=u&&u.role==='owner'?vNew():(go('#/login'),'');
+  else html=vHome();
+  $('#app').innerHTML=html;flash='';
+  if(!h.startsWith('#/new'))window.scrollTo(0,0);
+}
+window.addEventListener('hashchange',render);
+applyLang();render();
+</script>
+</body>
+</html>
