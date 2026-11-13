@@ -9,7 +9,7 @@ npm run dev   # seeds demo data. Logins (password demo12345): admin@demo.com, ow
 Production: `ADMIN_EMAIL=you@x.com ADMIN_PASSWORD='long-password' NODE_ENV=production npm start` (creates the first admin; DB starts empty).
 Optional `ANTHROPIC_API_KEY` enables AI document reading and the investor assistant.
 
-**GitHub Pages / static hosts:** no server, so `index.html` falls back to a browser-only demo (localStorage): marketplace, wallet, analysis, simulator, compare. Admin, KYC, uploads, contracts, community, polls, notifications, resale market and 2FA need the Node server.
+**GitHub Pages / static hosts:** no server, so `index.html` automatically falls back to a **full browser-only simulation** (localStorage) of every feature — admin dashboard, KYC, documents (metadata only), contracts, wallet/withdrawal approval, notifications, community, polls, resale market, 2FA (real TOTP), complaints. Data lives only in that browser and passwords are not protected; use the Node server for anything real.
 
 ## Phase 1 — core
 Accounts (scrypt, HttpOnly sessions, rate limits), roles, KYC with document upload, funding applications, admin review/risk rating, search & filters, calculator, wallet with admin-approved withdrawals, audit log, admin reports.

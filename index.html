@@ -152,7 +152,7 @@ const T={
  txH:{ar:'سجل المحفظة',en:'Wallet history'},noTx:{ar:'لا توجد عمليات بعد.',en:'No transactions yet.'},
  tx_deposit:{ar:'إيداع',en:'Deposit'},tx_invest:{ar:'استثمار',en:'Investment'},tx_income:{ar:'دخل',en:'Income'},tx_withdraw:{ar:'سحب',en:'Withdrawal'},
  type:{ar:'النوع',en:'Type'},
- staticNote:{ar:'نسخة تجريبية: البيانات محفوظة في متصفحك فقط. حسابات التجربة: investor@demo.com / owner@demo.com — كلمة المرور demo12345',en:'Demo version: data is saved in your browser only. Demo accounts: investor@demo.com / owner@demo.com — password demo12345'},
+ staticNote:{ar:'نسخة تجريبية كاملة: كل الخدمات (الإدارة، التحقق، العقود، السوق الثانوي…) تعمل محاكاةً داخل متصفحك فقط. الحسابات: admin@demo.com / owner@demo.com / investor@demo.com — كلمة المرور demo12345',en:'Full demo: every service (admin, KYC, contracts, resale market…) is simulated inside your browser only. Accounts: admin@demo.com / owner@demo.com / investor@demo.com — password demo12345'},
  demoWallet:{ar:'نسخة تجريبية: لا توجد بوابة دفع حقيقية، والسحب يُسجَّل فقط.',en:'Demo: no real payment gateway; withdrawals are only recorded.'},
  /* errors */
  e_email_used:{ar:'البريد الإلكتروني مسجل مسبقًا.',en:'Email already registered.'},
@@ -213,6 +213,7 @@ const T={
  e_bad_file_type:{ar:'نوع الملف غير مدعوم (PDF أو PNG أو JPG فقط).',en:'Unsupported file type (PDF, PNG or JPG only).'},e_too_many_files:{ar:'تم الوصول للحد الأقصى من الملفات.',en:'File limit reached.'},
  e_below_minimum:{ar:'أقل من الحد الأدنى للاستثمار.',en:'Below the minimum investment.'},e_risk_required:{ar:'حدد مستوى المخاطرة قبل الاعتماد.',en:'Set a risk level before approving.'},
  /* phase 2-5 */
+ demoFile:{ar:'عرض تجريبي: الملف غير محفوظ',en:'demo: file not stored'},demoCodeHint:{ar:'رمز التجربة الحالي:',en:'Demo code right now:'},
  navAcademy:{ar:'الأكاديمية',en:'Academy'},navMarket:{ar:'السوق الثانوي',en:'Resale market'},navSim:{ar:'محاكي التوسع',en:'Expansion simulator'},navAccount:{ar:'حسابي',en:'Account'},navCompare:{ar:'مقارنة',en:'Compare'},
  compareAdd:{ar:'+ قارن',en:'+ Compare'},compareDel:{ar:'✓ في المقارنة',en:'✓ Comparing'},follow:{ar:'☆ تابع المشروع',en:'☆ Follow'},unfollow:{ar:'★ تتابع المشروع',en:'★ Following'},
  anaH:{ar:'التحليل المالي',en:'Financial analysis'},noFin:{ar:'لم يرفع صاحب المشروع بيانات مالية شهرية بعد.',en:'The owner has not uploaded monthly financials yet.'},
@@ -320,81 +321,247 @@ function setLang(l){lang=l;try{localStorage.setItem('tw_lang',l)}catch(e){}apply
 function applyLang(){document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr'}
 
 /* ---------- static (no-server) mode ----------
-   On a static host such as GitHub Pages there is no /api, so the very same API is
-   emulated on top of localStorage. This is a DEMO: data lives only in this browser. */
+   On a static host such as GitHub Pages there is no /api, so the WHOLE API is emulated on top of localStorage
+   (same rules as server.js: KYC, admin review, contracts, wallet, exits, 2FA...). It is a DEMO: data lives only in this browser. */
 let STATIC=false,S=null;
-const MK='tw_static_v4';
+const MK='tw_static_v5';
 const sErr=c=>{const e=new Error(c);e.code=c;return e};
 const sSave=()=>{try{localStorage.setItem(MK,JSON.stringify(S))}catch(e){}};
-const sId=()=>++S.n;
+const sId=()=>++S.n,sNow=()=>Date.now();
+const sUser=id=>S.users.find(u=>u.id===id);
 const sBal=u=>S.tx.filter(x=>x.uid===u).reduce((a,x)=>a+x.amount,0);
 const sCts=(v,min,max)=>{const n=Number(v);if(!Number.isFinite(n)||n<min||n>max)throw sErr('bad_input');return Math.round(n*100)};
+const sStr=(v,min,max)=>{if(typeof v!=='string')throw sErr('bad_input');const x=v.trim();if(x.length<min||x.length>max)throw sErr('bad_input');return x};
+const sInt=(v,min,max)=>{const n=Number(v);if(!Number.isInteger(n)||n<min||n>max)throw sErr('bad_input');return n};
 const sSold=p=>S.inv.filter(x=>x.pid===p.id).reduce((a,x)=>a+x.shares,0);
-const sTxAdd=(uid,type,amount,pid,note)=>S.tx.push({id:sId(),uid,type,amount,pid:pid||null,note:note||null,created:Date.now()});
-function sProj(p){const u=S.users.find(x=>x.id===p.oid),s=sSold(p);
-  return{id:p.id,title:p.title,category:p.category,description:p.description,owner:u?u.name:'',sharePrice:p.price/100,totalShares:p.total,sold:s,goal:p.price*p.total/100,raised:p.price*s/100,created:p.created}}
-function sAddProject(oid,b){const price=sCts(b.sharePrice,1,1e6),goal=sCts(b.goal,100,1e8),total=Math.floor(goal/price);
-  if(total<1||total>1e6||!CATS.includes(b.category)||String(b.title).trim().length<3||String(b.description).trim().length<10)throw sErr('bad_input');
-  const p={id:sId(),oid,title:String(b.title).trim(),category:b.category,description:String(b.description).trim(),price,total,created:Date.now()};S.projects.push(p);return p}
-function sBuy(u,pid,shares){const p=S.projects.find(x=>x.id===pid);if(!p)throw sErr('not_found');
-  if(!Number.isInteger(shares)||shares<1)throw sErr('bad_input');
-  if(shares>p.total-sSold(p))throw sErr('not_enough_shares');
+const sHeld=(uid,pid)=>S.inv.filter(x=>x.uid===uid&&x.pid===pid).reduce((a,x)=>a+x.shares,0);
+const sHolders=pid=>[...new Set(S.inv.filter(x=>x.pid===pid).map(x=>x.uid))];
+const sAudience=pid=>[...new Set([...sHolders(pid),...S.follows.filter(f=>f.pid===pid).map(f=>f.uid)])];
+function sAudit(actor,action,entity,eid,detail){S.audit.push({id:sId(),actor_id:actor,action,entity,entity_id:eid||null,detail:detail?JSON.stringify(detail):null,created:sNow()})}
+function sNotify(uid,type,pid,data){S.notifs.push({id:sId(),uid,type,pid:pid||null,data:data||{},read:false,created:sNow()})}
+function sTxAdd(uid,type,amount,pid,note){const x={id:sId(),uid,type,amount,pid:pid||null,note:note||null,created:sNow()};S.tx.push(x);return x}
+const sOpt=(v,f)=>v===undefined||v===null||v===''?null:f(v);
+async function sSha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+/* TOTP (RFC 6238) with WebCrypto, so real authenticator apps work */
+const B32='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+const b32enc=a=>{let bits='',o='';a.forEach(b=>bits+=b.toString(2).padStart(8,'0'));for(let i=0;i<bits.length;i+=5)o+=B32[parseInt(bits.slice(i,i+5).padEnd(5,'0'),2)];return o};
+const b32dec=s=>{let bits='';for(const c of s)bits+=B32.indexOf(c).toString(2).padStart(5,'0');const o=[];for(let i=0;i+8<=bits.length;i+=8)o.push(parseInt(bits.slice(i,i+8),2));return new Uint8Array(o)};
+async function totpAt(secret,counter){const k=await crypto.subtle.importKey('raw',b32dec(secret),{name:'HMAC',hash:'SHA-1'},false,['sign']);const b=new ArrayBuffer(8);new DataView(b).setBigUint64(0,BigInt(counter));
+  const h=new Uint8Array(await crypto.subtle.sign('HMAC',k,b)),o=h[19]&15;return String(((h[o]&0x7f)<<24|h[o+1]<<16|h[o+2]<<8|h[o+3])%1e6).padStart(6,'0')}
+async function totpValid(secret,code){const c=Math.floor(Date.now()/30000);for(const d of[-1,0,1])if(await totpAt(secret,c+d)===String(code))return true;return false}
+
+function sProj(p,priv){const u=sUser(p.oid),s=sSold(p);
+  const o={id:p.id,title:p.title,category:p.category,description:p.description,owner:(u&&(u.company||u.name))||'',ownerId:p.oid,sharePrice:p.price/100,totalShares:p.total,sold:s,goal:p.price*p.total/100,raised:p.price*s/100,created:p.created,
+    status:p.status,risk:p.risk,location:p.location,foundedYear:p.founded,branches:p.branches,employees:p.employees,monthlySales:p.mSales,monthlyProfit:p.mProfit,durationMonths:p.duration,
+    expectedReturn:p.expRet,minShares:p.minShares,useOfFunds:p.uses,profitTerms:p.profitT,exitTerms:p.exitT,verificationNote:p.vNote,verifiedDocs:[...new Set(S.docs.filter(d=>d.pid===p.id).map(d=>d.kind))]};
+  if(priv){o.adminNote=p.aNote;o.documents=S.docs.filter(d=>d.pid===p.id).map(d=>({id:d.id,kind:d.kind,filename:d.filename,size:d.size,created:d.created}))}
+  return o}
+function sAddProject(oid,b,status){const price=sCts(b.sharePrice,1,1e6),goal=sCts(b.goal,100,1e8),total=Math.floor(goal/price);
+  if(total<1||total>1e6||!CATS.includes(b.category))throw sErr('bad_input');
+  const er=sOpt(b.expectedReturn,Number);if(er!==null&&(!Number.isFinite(er)||er<-100||er>500))throw sErr('bad_input');
+  const p={id:sId(),oid,title:sStr(b.title,3,120),category:b.category,description:sStr(b.description,10,3000),price,total,created:sNow(),status:status||'pending',risk:'unrated',
+    location:sOpt(b.location,v=>sStr(v,1,120)),founded:sOpt(b.foundedYear,v=>sInt(v,1900,2100)),branches:sOpt(b.branches,v=>sInt(v,0,1e4)),employees:sOpt(b.employees,v=>sInt(v,0,1e6)),
+    mSales:sOpt(b.monthlySales,Number),mProfit:sOpt(b.monthlyProfit,Number),duration:sOpt(b.durationMonths,v=>sInt(v,1,600)),expRet:er,minShares:b.minShares?sInt(b.minShares,1,total):1,
+    uses:sOpt(b.useOfFunds,v=>sStr(v,1,2000)),profitT:sOpt(b.profitTerms,v=>sStr(v,1,2000)),exitT:sOpt(b.exitTerms,v=>sStr(v,1,2000)),vNote:null,aNote:null};
+  S.projects.push(p);sAudit(oid,'project.submitted','project',p.id,{title:p.title});return p}
+function sReqKyc(u){if(u.kyc!=='approved')throw sErr('kyc_required')}
+async function sContract(u,p,kind,shares,amount,sign){
+  const signer=sign&&typeof sign.signature==='string'?sign.signature.trim():'';if(!sign||sign.accept!==true||signer.length<3||signer.length>100)throw sErr('contract_required');
+  const terms={project:p.title,category:p.category,shares,sharePrice:p.price/100,amount:amount/100,durationMonths:p.duration,profitTerms:p.profitT,exitTerms:p.exitT,risk:p.risk,useOfFunds:p.uses};
+  const created=sNow(),c={id:sId(),uid:u.id,pid:p.id,kind,shares,amount,terms,signer,created,hash:await sSha(JSON.stringify(terms)+'|'+u.id+'|'+signer+'|'+created)};S.contracts.push(c);return c}
+async function sBuy(u,pid,shares,sign){sReqKyc(u);const p=S.projects.find(x=>x.id===pid);if(!p||p.status!=='approved')throw sErr('not_found');
+  if(!Number.isInteger(shares)||shares<1)throw sErr('bad_input');const sold=sSold(p),left=p.total-sold;
+  if(shares>left)throw sErr('not_enough_shares');if(shares<Math.min(p.minShares,left))throw sErr('below_minimum');
   const cost=shares*p.price;if(sBal(u.id)<cost)throw sErr('no_funds');
-  S.inv.push({id:sId(),pid,uid:u.id,shares,amount:cost,created:Date.now()});sTxAdd(u.id,'invest',-cost,pid);return sBal(u.id)/100}
-function sPayout(owner,pid,amt,note){const p=S.projects.find(x=>x.id===pid&&x.oid===owner.id);if(!p)throw sErr('not_found');
+  const c=await sContract(u,p,'primary',shares,cost,sign);S.inv.push({id:sId(),pid,uid:u.id,shares,amount:cost,created:sNow()});sTxAdd(u.id,'invest',-cost,pid);
+  sAudit(u.id,'investment.created','project',pid,{shares,amount:cost/100,contract:c.id});
+  if(shares>=left){sNotify(p.oid,'fully_funded',pid);sAudience(pid).forEach(x=>sNotify(x,'fully_funded',pid))}
+  else if((sold+shares)/p.total>=.9&&sold/p.total<.9)S.follows.filter(f=>f.pid===pid).forEach(f=>sNotify(f.uid,'almost_funded',pid));
+  return sBal(u.id)/100}
+function sPayout(owner,pid,amt,note){const p=S.projects.find(x=>x.id===pid&&x.oid===owner.id&&x.status==='approved');if(!p)throw sErr('not_found');
   const m={};S.inv.filter(x=>x.pid===pid).forEach(x=>m[x.uid]=(m[x.uid]||0)+x.shares);
   const h=Object.entries(m).map(([uid,sh])=>({uid:+uid,sh})).sort((a,b)=>b.sh-a.sh);if(!h.length)throw sErr('no_investors');
   const sold=sSold(p);let given=0;h.forEach(x=>{x.c=Math.floor(amt*x.sh/sold);given+=x.c});h[0].c+=amt-given;
-  S.payouts.push({id:sId(),pid,amount:amt,note,created:Date.now()});h.forEach(x=>x.c>0&&sTxAdd(x.uid,'income',x.c,pid,note));return h.length}
+  S.payouts.push({id:sId(),pid,amount:amt,note,created:sNow()});h.forEach(x=>{if(x.c>0){sTxAdd(x.uid,'income',x.c,pid,note);sNotify(x.uid,'payout',pid,{amount:x.c/100})}});
+  sAudit(owner.id,'payout.distributed','project',pid,{amount:amt/100,investors:h.length});return h.length}
+function sSaveFin(owner,pid,rows){const p=S.projects.find(x=>x.id===pid&&x.oid===owner.id);if(!p)throw sErr('not_found');
+  if(!Array.isArray(rows)||!rows.length||rows.length>36)throw sErr('bad_input');S.fin[pid]=S.fin[pid]||{};
+  rows.forEach(r=>{if(!r||!/^\d{4}-(0[1-9]|1[0-2])$/.test(r.month))throw sErr('bad_input');const o={month:r.month,verified:false};TWAnalysis.FIELDS.forEach(k=>{const v=Number(r[k]||0);if(!Number.isFinite(v)||v<0||v>1e9)throw sErr('bad_input');o[k]=v});S.fin[pid][r.month]=o});
+  sAudit(owner.id,'financials.saved','project',pid,{months:rows.map(r=>r.month)})}
+function sAnalysis(pid){const p=S.projects.find(x=>x.id===pid);const rows=Object.values((S.fin||{})[pid]||{}).sort((a,b)=>a.month<b.month?-1:1);
+  const a=TWAnalysis.analyze(rows,{declaredSales:p.mSales||0,declaredProfit:p.mProfit||0,foundedYear:p.founded,docKinds:new Set(S.docs.filter(d=>d.pid===pid).map(d=>d.kind)).size});return{...a,rows}}
+const sExitOut=e=>{const p=S.projects.find(x=>x.id===e.pid);return{id:e.id,projectId:e.pid,project:p.title,shares:e.shares,pricePerShare:e.price/100,total:e.shares*e.price/100,faceValue:p.price/100,status:e.status,created:e.created}};
+
 function sLoad(){
   try{const d=JSON.parse(localStorage.getItem(MK));if(d&&d.users){S=d;return}}catch(e){}
-  S={n:100,session:null,users:[],projects:[],inv:[],payouts:[],tx:[],fin:{}};
-  const o={id:sId(),name:'صاحب مشروع تجريبي',email:'owner@demo.com',pass:'demo12345',role:'owner'};
-  const i={id:sId(),name:'مستثمر تجريبي',email:'investor@demo.com',pass:'demo12345',role:'investor'};S.users.push(o,i);
-  const a=sAddProject(o.id,{title:'مزرعة الوادي الأخضر للزيتون',category:'agri',goal:50000,sharePrice:100,description:'توسعة مزرعة الزيتون العائلية بمعصرة جديدة و٢٠٠٠ شجرة إضافية. يأتي الدخل من بيع زيت الزيتون الفاخر.'});
-  const b=sAddProject(o.id,{title:'محمصة قهوة المدينة',category:'food',goal:30000,sharePrice:50,description:'محمصة قهوة تزوّد ٣٠ مقهى في الحي. تُستخدم الأموال لشراء آلة تحميص ثانية وخط تغليف.'});
-  sAddProject(o.id,{title:'ألواح شمسية لمدرسة النور',category:'energy',goal:80000,sharePrice:200,description:'تركيب ألواح شمسية على السطح وبيع فائض الكهرباء للشبكة. يُوزَّع الدخل من مبيعات الطاقة الشهرية.'});
+  S={n:100,session:null,users:[],projects:[],docs:[],inv:[],payouts:[],tx:[],wd:[],contracts:[],reports:[],notifs:[],posts:[],polls:[],follows:[],exits:[],complaints:[],audit:[],fin:{}};
+  const mkU=(name,email,role,extra)=>{const u={id:sId(),name,email,pass:'demo12345',role,phone:null,company:null,nid:null,kyc:role==='owner'?'none':'approved',kycNote:null,totpSecret:null,totp:false,riskTol:null,exp:null,created:sNow(),...extra};S.users.push(u);return u};
+  const adm=mkU('مدير المنصة','admin@demo.com','admin'),o=mkU('صاحب مشروع تجريبي','owner@demo.com','owner',{company:'شركة الوادي للتجارة'}),i=mkU('مستثمر تجريبي','investor@demo.com','investor');
+  const mk=(b,risk)=>{const p=sAddProject(o.id,b,'approved');p.risk=risk;return p};
+  const a=mk({title:'مزرعة الوادي الأخضر للزيتون',category:'agri',goal:50000,sharePrice:100,location:'الفيوم',foundedYear:2016,branches:1,employees:14,monthlySales:18000,monthlyProfit:5200,durationMonths:24,expectedReturn:18,minShares:5,
+    description:'توسعة مزرعة الزيتون العائلية بمعصرة جديدة و٢٠٠٠ شجرة إضافية. يأتي الدخل من بيع زيت الزيتون الفاخر.',useOfFunds:'معصرة حديثة ٦٠٪، شتلات وري ٣٠٪، تسويق ١٠٪',profitTerms:'توزيع ربع سنوي بنسبة الأسهم من صافي الربح المعتمد',exitTerms:'تخارج بعد ٢٤ شهرًا أو بيع الحصص لمستثمر آخر بموافقة المنصة'},'medium');
+  const b=mk({title:'محمصة قهوة المدينة',category:'food',goal:30000,sharePrice:50,location:'القاهرة',foundedYear:2019,branches:2,employees:9,monthlySales:24000,monthlyProfit:6100,durationMonths:18,expectedReturn:22,minShares:10,
+    description:'محمصة قهوة تزوّد ٣٠ مقهى في الحي. تُستخدم الأموال لشراء آلة تحميص ثانية وخط تغليف.',useOfFunds:'آلة تحميص ٥٥٪، خط تغليف ٣٠٪، مخزون ١٥٪',profitTerms:'توزيع شهري من صافي الربح',exitTerms:'تخارج بعد ١٨ شهرًا'},'low');
+  mk({title:'ألواح شمسية لمدرسة النور',category:'energy',goal:80000,sharePrice:200,location:'الجيزة',foundedYear:2021,branches:1,employees:4,monthlySales:9000,monthlyProfit:4000,durationMonths:36,expectedReturn:14,
+    description:'تركيب ألواح شمسية على السطح وبيع فائض الكهرباء للشبكة. يُوزَّع الدخل من مبيعات الطاقة الشهرية.',useOfFunds:'ألواح ومحولات ٨٥٪، تركيب ١٠٪، صيانة ٥٪',profitTerms:'توزيع نصف سنوي',exitTerms:'تخارج بعد ٣٦ شهرًا'},'high');
+  sAddProject(o.id,{title:'مصنع تغليف جديد (قيد المراجعة)',category:'other',goal:60000,sharePrice:100,description:'طلب تمويل جديد في انتظار مراجعة الإدارة والمستندات.'});
+  S.docs.push({id:sId(),uid:o.id,pid:a.id,kind:'commercial_register',filename:'commercial-register.pdf',size:120000,created:sNow()},{id:sId(),uid:o.id,pid:a.id,kind:'tax_card',filename:'tax-card.pdf',size:80000,created:sNow()},{id:sId(),uid:o.id,pid:a.id,kind:'financials',filename:'financials-2026.pdf',size:300000,created:sNow()});
   S.fin[a.id]={};for(let m=1;m<=9;m++){const mo='2026-0'+m;S.fin[a.id][mo]={month:mo,revenue:17000+m*450+(m%3)*300,cogs:6200+(m%4)*150,direct:900,indirect:700,payroll:3900,rent:1500,utilities:450,commissions:200,marketing:600,other:250,debtPayments:400,liabilities:14000-m*300,verified:m<=5}}
-  sTxAdd(i.id,'deposit',2500000);sBuy(i,a.id,120);sBuy(i,b.id,80);sPayout(o,a.id,120000,'مبيعات الزيت للربع الثالث');sSave();
+  sTxAdd(i.id,'deposit',2500000);
+  const sign={accept:true,signature:i.name};
+  // seed purchases synchronously (contracts get a placeholder hash; real hashes are computed for new purchases)
+  [[a,120],[b,80]].forEach(([p,sh])=>{const cost=sh*p.price;S.contracts.push({id:sId(),uid:i.id,pid:p.id,kind:'primary',shares:sh,amount:cost,signer:sign.signature,created:sNow(),hash:'seed'+Math.abs(sh*7919+p.id).toString(16).padStart(8,'0').repeat(7),
+    terms:{project:p.title,category:p.category,shares:sh,sharePrice:p.price/100,amount:cost/100,durationMonths:p.duration,profitTerms:p.profitT,exitTerms:p.exitT,risk:p.risk,useOfFunds:p.uses}});
+    S.inv.push({id:sId(),pid:p.id,uid:i.id,shares:sh,amount:cost,created:sNow()});sTxAdd(i.id,'invest',-cost,p.id)});
+  sPayout(o,a.id,120000,'مبيعات الزيت للربع الثالث');
+  S.reports.push({pid:a.id,month:'2026-09',summary:'ارتفعت المبيعات بفضل موسم الحصاد وتم تركيب المعصرة الجديدة.',sales:21000,expenses:15500,challenges:'ارتفاع تكلفة العبوات',nextPlan:'البدء في زراعة ٥٠٠ شجرة جديدة',created:sNow()});
+  S.posts.push({id:sId(),pid:a.id,uid:o.id,kind:'update',parent:null,body:'تم الانتهاء من تركيب المعصرة وبدء التشغيل التجريبي.',created:sNow()});
+  S.polls.push({id:sId(),pid:a.id,question:'هل توافقون على إعادة استثمار ٢٠٪ من أرباح الربع القادم في التوسعة؟',options:['نعم','لا'],closes:sNow()+14*864e5,created:sNow(),votes:[]});
+  sSave();
 }
+function sOwnerProj(u,pid){const p=S.projects.find(x=>x.id===pid&&x.oid===u.id);if(!p)throw sErr('not_found');return p}
+function sSeeProj(cur,p){return p.status==='approved'||(cur&&(cur.role==='admin'||cur.id===p.oid))}
+function sInvestorDash(u){
+  const ids=[...new Set(S.inv.filter(x=>x.uid===u.id).map(x=>x.pid))];
+  const inc=pid=>S.tx.filter(x=>x.uid===u.id&&x.type==='income'&&x.pid===pid).reduce((a,x)=>a+x.amount,0);
+  const holdings=ids.map(pid=>{const p=S.projects.find(x=>x.id===pid),sh=sHeld(u.id,pid);return{id:pid,title:p.title,shares:sh,totalShares:p.total,invested:sh*p.price/100,income:inc(pid)/100}}).filter(h=>h.shares>0);
+  return{balance:sBal(u.id)/100,pendingWithdrawals:S.wd.filter(w=>w.uid===u.id&&w.status==='pending').reduce((a,w)=>a+w.amount,0)/100,holdings,
+    totalIncome:S.tx.filter(x=>x.uid===u.id&&x.type==='income').reduce((a,x)=>a+x.amount,0)/100,
+    history:S.tx.filter(x=>x.uid===u.id).slice().reverse().slice(0,200).map(x=>({id:x.id,type:x.type,amount:x.amount/100,note:x.note,project:(S.projects.find(p=>p.id===x.pid)||{}).title||null,date:x.created}))}}
+
 async function staticApi(method,url,body){
-  body=body||{};if(!S)sLoad();const cur=S.users.find(u=>u.id===S.session)||null;let m;
+  body=body||{};if(!S)sLoad();const cur=sUser(S.session)||null;let m;
   const need=role=>{if(!cur)throw sErr('unauth');if(role&&cur.role!==role)throw sErr('forbidden');return cur};
   const done=v=>{sSave();return v};
+  const meOut=u=>({id:u.id,name:u.name,email:u.email,role:u.role,phone:u.phone,company:u.company,kyc:u.kyc,kycNote:u.kycNote,totp:u.totp,riskTolerance:u.riskTol,experience:u.exp,balance:u.role==='investor'?sBal(u.id)/100:undefined});
+  /* ---- auth ---- */
   if(url==='/api/signup'&&method==='POST'){
-    const name=String(body.name||'').trim(),email=String(body.email||'').trim().toLowerCase(),pw=String(body.password||'');
-    if(name.length<2||!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)||pw.length<8||!['investor','owner'].includes(body.role))throw sErr('bad_input');
+    const name=sStr(body.name,2,80),email=sStr(body.email,3,320).toLowerCase(),pw=sStr(body.password,8,200);
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)||!['investor','owner'].includes(body.role))throw sErr('bad_input');
+    const phone=body.phone?sStr(body.phone,6,20):null;if(phone&&!/^\+?[0-9 ()-]{6,20}$/.test(phone))throw sErr('bad_input');
     if(S.users.some(u=>u.email===email))throw sErr('email_used');
-    const u={id:sId(),name,email,pass:pw,role:body.role};S.users.push(u);S.session=u.id;return done({ok:true})}
+    const u={id:sId(),name,email,pass:pw,role:body.role,phone,company:body.role==='owner'&&body.company?sStr(body.company,2,120):null,nid:null,kyc:'none',kycNote:null,totpSecret:null,totp:false,riskTol:null,exp:null,created:sNow()};
+    S.users.push(u);S.session=u.id;return done({ok:true})}
   if(url==='/api/login'&&method==='POST'){
-    const u=S.users.find(x=>x.email===String(body.email||'').trim().toLowerCase()&&x.pass===body.password);
-    if(!u)throw sErr('bad_login');S.session=u.id;return done({ok:true})}
+    const u=S.users.find(x=>x.email===String(body.email||'').trim().toLowerCase()&&x.pass===body.password);if(!u)throw sErr('bad_login');
+    if(u.totp){if(!body.code)throw sErr('totp_required');if(!await totpValid(u.totpSecret,body.code))throw sErr('bad_code')}
+    S.session=u.id;return done({ok:true})}
   if(url==='/api/logout'){S.session=null;return done({ok:true})}
-  if(url==='/api/me')return{user:cur?{id:cur.id,name:cur.name,email:cur.email,role:cur.role,balance:cur.role==='investor'?sBal(cur.id)/100:undefined}:null};
-  if(url==='/api/projects'&&method==='GET')return S.projects.slice().reverse().map(sProj);
-  if(url==='/api/projects'&&method==='POST')return done({id:sAddProject(need('owner').id,body).id});
-  if(m=url.match(/^\/api\/projects\/(\d+)$/)){const p=S.projects.find(x=>x.id===+m[1]);if(!p)throw sErr('not_found');return sProj(p)}
-  if(m=url.match(/^\/api\/projects\/(\d+)\/buy$/))return done({balance:sBuy(need('investor'),+m[1],body.shares)});
-  if(m=url.match(/^\/api\/projects\/(\d+)\/payout$/))return done({investors:sPayout(need('owner'),+m[1],sCts(body.amount,.01,1e7),String(body.note||'').slice(0,120))});
-  if(url==='/api/wallet/deposit'){const u=need('investor');sTxAdd(u.id,'deposit',sCts(body.amount,.01,1e5));return done({balance:sBal(u.id)/100})}
-  if(url==='/api/wallet/withdraw'){const u=need('investor'),c=sCts(body.amount,.01,1e7),d=String(body.destination||'').trim();
-    if(d.length<4||d.length>100)throw sErr('bad_input');if(sBal(u.id)<c)throw sErr('no_funds');sTxAdd(u.id,'withdraw',-c,null,d);return done({balance:sBal(u.id)/100})}
-  if(url==='/api/investor/dashboard'){const u=need('investor'),mine=S.inv.filter(x=>x.uid===u.id),ids=[...new Set(mine.map(x=>x.pid))];
-    const inc=pid=>S.tx.filter(x=>x.uid===u.id&&x.type==='income'&&x.pid===pid).reduce((a,x)=>a+x.amount,0);
-    const holdings=ids.map(pid=>{const p=S.projects.find(x=>x.id===pid),sh=mine.filter(x=>x.pid===pid).reduce((a,x)=>a+x.shares,0);
-      return{id:pid,title:p.title,shares:sh,totalShares:p.total,invested:sh*p.price/100,income:inc(pid)/100}});
-    return{balance:sBal(u.id)/100,holdings,totalIncome:S.tx.filter(x=>x.uid===u.id&&x.type==='income').reduce((a,x)=>a+x.amount,0)/100,
-      history:S.tx.filter(x=>x.uid===u.id).slice().reverse().map(x=>({id:x.id,type:x.type,amount:x.amount/100,note:x.note,project:(S.projects.find(p=>p.id===x.pid)||{}).title||null,date:x.created}))}}
-  if(m=url.match(/^\/api\/projects\/(\d+)\/analysis$/)){const pid=+m[1];if(!S.projects.find(x=>x.id===pid))throw sErr('not_found');
-    const rows=Object.values((S.fin||{})[pid]||{}).sort((a,b)=>a.month<b.month?-1:1);return{...TWAnalysis.analyze(rows,{docKinds:0}),rows}}
-  if((m=url.match(/^\/api\/projects\/(\d+)\/financials$/))&&method==='PUT'){const u=need('owner'),pid=+m[1];if(!S.projects.find(x=>x.id===pid&&x.oid===u.id))throw sErr('not_found');
-    S.fin=S.fin||{};S.fin[pid]=S.fin[pid]||{};if(!Array.isArray(body.rows)||!body.rows.length)throw sErr('bad_input');
-    body.rows.forEach(r=>{if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(r.month))throw sErr('bad_input');const o={month:r.month,verified:false};TWAnalysis.FIELDS.forEach(k=>o[k]=Math.max(0,+r[k]||0));S.fin[pid][r.month]=o});return done({ok:true})}
-  if((m=url.match(/^\/api\/projects\/(\d+)\/financials\/(\d{4}-\d{2})$/))&&method==='DELETE'){const u=need('owner');if(S.fin&&S.fin[+m[1]])delete S.fin[+m[1]][m[2]];return done({ok:true})}
+  if(url==='/api/me')return{user:cur?meOut(cur):null};
+  if(url==='/api/config')return{ai:false};
+  /* ---- kyc & documents ---- */
+  if(url==='/api/documents'&&method==='POST'){const u=need();if(u.role==='admin')throw sErr('forbidden');
+    const kinds=['kyc_id','commercial_register','tax_card','license','financials','bank_statement','invoice','contract','ownership','payroll','other'];
+    if(!kinds.includes(body.kind)||typeof body.data!=='string')throw sErr('bad_input');const size=Math.floor(body.data.length*3/4);if(size>2*1024*1024)throw sErr('file_too_large');
+    const head=atob(body.data.slice(0,16));if(!(head.startsWith('%PDF')||head.startsWith('\x89PNG')||head.startsWith('\xff\xd8\xff')))throw sErr('bad_file_type');
+    let pid=null;if(body.projectId!=null){pid=+body.projectId;sOwnerProj(u,pid)}else if(body.kind!=='kyc_id')throw sErr('bad_input');
+    const d={id:sId(),uid:u.id,pid,kind:body.kind,filename:sStr(body.filename,1,150),size,created:sNow()};S.docs.push(d);sAudit(u.id,'document.uploaded',pid?'project':'user',pid||u.id,{kind:d.kind,filename:d.filename});return done({id:d.id})}
+  if(url==='/api/kyc'&&method==='POST'){const u=need();if(u.role==='admin')throw sErr('forbidden');
+    const fn=sStr(body.fullName,3,100),nid=sStr(body.nationalId,6,20),ph=sStr(body.phone,6,20);
+    if(!/^[0-9A-Za-z-]{6,20}$/.test(nid)||!/^\+?[0-9 ()-]{6,20}$/.test(ph))throw sErr('bad_input');
+    if(!S.docs.some(d=>d.uid===u.id&&!d.pid&&d.kind==='kyc_id'))throw sErr('need_document');if(u.kyc==='approved'||u.kyc==='pending')throw sErr('kyc_locked');
+    Object.assign(u,{name:fn,nid,phone:ph,kyc:'pending',kycNote:null});sAudit(u.id,'kyc.submitted','user',u.id);return done({ok:true})}
+  /* ---- projects ---- */
+  if(url==='/api/projects'&&method==='GET')return S.projects.filter(p=>p.status==='approved').slice().reverse().map(p=>sProj(p));
+  if(url==='/api/projects'&&method==='POST'){const p=sAddProject(need('owner').id,body);return done({id:p.id})}
+  if(m=url.match(/^\/api\/projects\/(\d+)$/)){const p=S.projects.find(x=>x.id===+m[1]);if(!p||!sSeeProj(cur,p))throw sErr('not_found');return sProj(p,cur&&(cur.role==='admin'||cur.id===p.oid))}
+  if(m=url.match(/^\/api\/projects\/(\d+)\/buy$/))return done({balance:await sBuy(need('investor'),+m[1],sInt(body.shares,1,1e6),{accept:body.accept,signature:body.signature})});
+  if(m=url.match(/^\/api\/projects\/(\d+)\/payout$/))return done({investors:sPayout(need('owner'),+m[1],sCts(body.amount,.01,1e7),body.note?sStr(body.note,0,120):'')});
+  if(m=url.match(/^\/api\/projects\/(\d+)\/analysis$/)){const p=S.projects.find(x=>x.id===+m[1]);if(!p||!sSeeProj(cur,p))throw sErr('not_found');return sAnalysis(p.id)}
+  if((m=url.match(/^\/api\/projects\/(\d+)\/financials$/))&&method==='PUT'){sSaveFin(need('owner'),+m[1],body.rows);return done({ok:true})}
+  if((m=url.match(/^\/api\/projects\/(\d+)\/financials\/(\d{4}-\d{2})$/))&&method==='DELETE'){const u=need('owner');sOwnerProj(u,+m[1]);if(S.fin[+m[1]])delete S.fin[+m[1]][m[2]];sAudit(u.id,'financials.deleted','project',+m[1],{month:m[2]});return done({ok:true})}
+  /* ---- reports / posts / polls / follows ---- */
+  if(m=url.match(/^\/api\/projects\/(\d+)\/reports$/)){const pid=+m[1],p=S.projects.find(x=>x.id===pid);if(!p||!sSeeProj(cur,p))throw sErr('not_found');
+    if(method==='POST'){const u=need('owner');sOwnerProj(u,pid);if(p.status!=='approved')throw sErr('forbidden');if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(body.month||''))throw sErr('bad_input');
+      S.reports=S.reports.filter(r=>!(r.pid===pid&&r.month===body.month));S.reports.push({pid,month:body.month,summary:sStr(body.summary,10,3000),sales:sOpt(body.sales,Number),expenses:sOpt(body.expenses,Number),challenges:sOpt(body.challenges,v=>sStr(v,1,2000)),nextPlan:sOpt(body.nextPlan,v=>sStr(v,1,2000)),created:sNow()});
+      sAudit(u.id,'report.published','project',pid,{month:body.month});sAudience(pid).forEach(x=>sNotify(x,'report',pid,{month:body.month}));return done({ok:true})}
+    if(!(cur&&(sHeld(cur.id,pid)||cur.role==='admin'||cur.id===p.oid)))throw sErr('holders_only');
+    return S.reports.filter(r=>r.pid===pid).sort((a,b)=>a.month<b.month?1:-1)}
+  if(m=url.match(/^\/api\/projects\/(\d+)\/posts$/)){const pid=+m[1],p=S.projects.find(x=>x.id===pid);if(!p||p.status!=='approved')throw sErr('not_found');
+    if(method==='POST'){const u=need(),text=sStr(body.body,2,1500);let kind,parent=null;
+      if(u.id===p.oid){if(body.parentId){parent=+body.parentId;if(!S.posts.some(x=>x.id===parent&&x.pid===pid&&x.kind==='question'))throw sErr('bad_input');kind='answer'}else kind='update'}
+      else if(u.role==='investor')kind='question';else throw sErr('forbidden');
+      const post={id:sId(),pid,uid:u.id,kind,parent,body:text,created:sNow()};S.posts.push(post);
+      if(kind==='update')sAudience(pid).forEach(x=>sNotify(x,'update',pid));if(kind==='question')sNotify(p.oid,'question',pid);if(kind==='answer')sNotify(S.posts.find(x=>x.id===parent).uid,'answer',pid);return done({id:post.id})}
+    return S.posts.filter(x=>x.pid===pid).map(x=>{const a=sUser(x.uid);return{id:x.id,kind:x.kind,parentId:x.parent,body:x.body,created:x.created,author:a.role==='owner'?a.name:a.name.split(' ')[0],role:a.role}})}
+  if(m=url.match(/^\/api\/projects\/(\d+)\/polls$/)){const pid=+m[1],p=S.projects.find(x=>x.id===pid);if(!p||!sSeeProj(cur,p))throw sErr('not_found');
+    if(method==='POST'){const u=need('owner');sOwnerProj(u,pid);if(p.status!=='approved')throw sErr('forbidden');const opts=Array.isArray(body.options)?body.options.map(o=>sStr(o,1,100)):null;if(!opts||opts.length<2||opts.length>6)throw sErr('bad_input');
+      const pl={id:sId(),pid,question:sStr(body.question,5,300),options:opts,closes:sNow()+sInt(body.days??7,1,60)*864e5,created:sNow(),votes:[]};S.polls.push(pl);sHolders(pid).forEach(x=>sNotify(x,'poll',pid));sAudit(u.id,'poll.created','project',pid,{question:pl.question});return done({id:pl.id})}
+    return S.polls.filter(x=>x.pid===pid).reverse().map(pl=>{const tally=pl.options.map(()=>0);pl.votes.forEach(v=>tally[v.idx]+=v.w);const mine=cur&&pl.votes.find(v=>v.uid===cur.id);
+      return{id:pl.id,question:pl.question,options:pl.options,tally,closes:pl.closes,open:pl.closes>sNow(),myVote:mine?mine.idx:null}})}
+  if(m=url.match(/^\/api\/polls\/(\d+)\/vote$/)){const u=need('investor'),pl=S.polls.find(x=>x.id===+m[1]);if(!pl||pl.closes<sNow())throw sErr('not_found');const w=sHeld(u.id,pl.pid);if(!w)throw sErr('holders_only');
+    const idx=body.option;if(!Number.isInteger(idx)||idx<0||idx>=pl.options.length)throw sErr('bad_input');if(pl.votes.some(v=>v.uid===u.id))throw sErr('already_voted');pl.votes.push({uid:u.id,idx,w});return done({ok:true})}
+  if(url==='/api/follows')return S.follows.filter(f=>f.uid===need().id).map(f=>f.pid);
+  if(m=url.match(/^\/api\/projects\/(\d+)\/follow$/)){const u=need(),pid=+m[1];if(method==='POST'){if(!S.projects.some(p=>p.id===pid&&p.status==='approved'))throw sErr('not_found');if(!S.follows.some(f=>f.uid===u.id&&f.pid===pid))S.follows.push({uid:u.id,pid})}else S.follows=S.follows.filter(f=>!(f.uid===u.id&&f.pid===pid));return done({ok:true})}
+  if(m=url.match(/^\/api\/owners\/(\d+)\/reputation$/)){const o=sUser(+m[1]);if(!o||o.role!=='owner')throw sErr('not_found');const ps=S.projects.filter(p=>p.oid===o.id&&p.status==='approved');
+    const sc=ps.map(p=>sAnalysis(p.id).rating).filter(Boolean).map(r=>r.score);
+    return{name:o.company||o.name,memberSince:o.created,projects:ps.length,raised:S.inv.filter(i=>ps.some(p=>p.id===i.pid)).reduce((a,i)=>a+i.amount,0)/100,reports:S.reports.filter(r=>ps.some(p=>p.id===r.pid)).length,
+      avgScore:sc.length?Math.round(sc.reduce((a,b)=>a+b,0)/sc.length):null,payouts:S.payouts.filter(x=>ps.some(p=>p.id===x.pid)).length}}
+  /* ---- contracts / notifications ---- */
+  if(url==='/api/contracts')return S.contracts.filter(c=>c.uid===need().id).slice().reverse().map(c=>({id:c.id,kind:c.kind,shares:c.shares,amount:c.amount/100,created:c.created,project:S.projects.find(p=>p.id===c.pid).title,projectId:c.pid}));
+  if(m=url.match(/^\/api\/contracts\/(\d+)$/)){const u=need(),c=S.contracts.find(x=>x.id===+m[1]),p=c&&S.projects.find(x=>x.id===c.pid);if(!c||!(c.uid===u.id||p.oid===u.id||u.role==='admin'))throw sErr('not_found');
+    return{id:c.id,kind:c.kind,investor:sUser(c.uid).name,signer:c.signer,shares:c.shares,amount:c.amount/100,terms:c.terms,hash:c.hash,created:c.created,project:p.title}}
+  if(url==='/api/notifications'&&method==='GET'){const u=need();return S.notifs.filter(n=>n.uid===u.id).slice().reverse().slice(0,60).map(n=>({id:n.id,type:n.type,projectId:n.pid,project:(S.projects.find(p=>p.id===n.pid)||{}).title||null,data:n.data,read:n.read,created:n.created}))}
+  if(url==='/api/notifications/read'){const u=need();S.notifs.forEach(n=>{if(n.uid===u.id)n.read=true});return done({ok:true})}
+  /* ---- wallet ---- */
+  if(url==='/api/wallet/deposit'){const u=need('investor');sReqKyc(u);sTxAdd(u.id,'deposit',sCts(body.amount,.01,1e5));sAudit(u.id,'wallet.deposit','user',u.id);return done({balance:sBal(u.id)/100})}
+  if(url==='/api/wallet/withdraw'){const u=need('investor');sReqKyc(u);const c=sCts(body.amount,.01,1e7),d=sStr(body.destination,4,100);if(sBal(u.id)<c)throw sErr('no_funds');
+    const t2=sTxAdd(u.id,'withdraw',-c,null,d);const w={id:sId(),uid:u.id,txid:t2.id,amount:c,dest:d,status:'pending',created:sNow()};S.wd.push(w);sAudit(u.id,'withdrawal.requested','withdrawal',w.id,{amount:c/100});return done({balance:sBal(u.id)/100})}
+  if(url==='/api/investor/dashboard')return sInvestorDash(need('investor'));
   if(url==='/api/owner/dashboard'){const u=need('owner');
-    return S.projects.filter(p=>p.oid===u.id).reverse().map(p=>{const by={};S.inv.filter(x=>x.pid===p.id).forEach(x=>by[x.uid]=(by[x.uid]||0)+x.shares);
-      return{...sProj(p),investors:Object.entries(by).map(([id,sh])=>({name:S.users.find(x=>x.id===+id).name,shares:sh,amount:sh*p.price/100})).sort((a,b)=>b.shares-a.shares),
+    return S.projects.filter(p=>p.oid===u.id).slice().reverse().map(p=>{const by={};S.inv.filter(x=>x.pid===p.id).forEach(x=>by[x.uid]=(by[x.uid]||0)+x.shares);
+      return{...sProj(p,true),investors:Object.entries(by).map(([id,sh])=>({name:sUser(+id).name,shares:sh,amount:sh*p.price/100})).sort((a,b)=>b.shares-a.shares),
         payouts:S.payouts.filter(x=>x.pid===p.id).reverse().map(x=>({amount:x.amount/100,note:x.note,date:x.created}))}})}
+  /* ---- exits / resale ---- */
+  if(url==='/api/exits'&&method==='GET'){need();return S.exits.filter(e=>e.status==='open').slice().reverse().map(sExitOut)}
+  if(url==='/api/exits/mine')return S.exits.filter(e=>e.sid===need().id).slice().reverse().map(sExitOut);
+  if(url==='/api/exits'&&method==='POST'){const u=need('investor');sReqKyc(u);const pid=sInt(body.projectId,1,1e9),sh=sInt(body.shares,1,1e6),pr=sCts(body.pricePerShare,.01,1e6);
+    const listed=S.exits.filter(e=>e.sid===u.id&&e.pid===pid&&['pending','open'].includes(e.status)).reduce((a,e)=>a+e.shares,0);if(sh>sHeld(u.id,pid)-listed)throw sErr('not_enough_shares');
+    const e={id:sId(),pid,sid:u.id,shares:sh,price:pr,status:'pending',created:sNow()};S.exits.push(e);sAudit(u.id,'exit.requested','project',pid,{shares:sh,price:pr/100});return done({id:e.id})}
+  if((m=url.match(/^\/api\/exits\/(\d+)$/))&&method==='DELETE'){const u=need(),e=S.exits.find(x=>x.id===+m[1]&&x.sid===u.id&&['pending','open'].includes(x.status));if(!e)throw sErr('not_found');e.status='cancelled';return done({ok:true})}
+  if(m=url.match(/^\/api\/exits\/(\d+)\/buy$/)){const u=need('investor');sReqKyc(u);const e=S.exits.find(x=>x.id===+m[1]&&x.status==='open');if(!e||e.sid===u.id)throw sErr('not_found');
+    const total=e.shares*e.price;if(sBal(u.id)<total)throw sErr('no_funds');if(sHeld(e.sid,e.pid)<e.shares)throw sErr('not_enough_shares');const p=S.projects.find(x=>x.id===e.pid);
+    await sContract(u,p,'secondary',e.shares,total,{accept:body.accept,signature:body.signature});let left=e.shares;
+    for(const r of S.inv.filter(x=>x.pid===e.pid&&x.uid===e.sid)){if(!left)break;const take=Math.min(left,r.shares);left-=take;r.shares-=take;r.amount=r.shares*p.price}
+    S.inv=S.inv.filter(x=>x.shares>0);S.inv.push({id:sId(),pid:e.pid,uid:u.id,shares:e.shares,amount:e.shares*p.price,created:sNow()});
+    sTxAdd(u.id,'purchase',-total,e.pid);sTxAdd(e.sid,'sale',total,e.pid);e.status='sold';e.buyer=u.id;sAudit(u.id,'exit.sold','project',e.pid,{exit:e.id,total:total/100});sNotify(e.sid,'exit_sold',e.pid,{amount:total/100});return done({balance:sBal(u.id)/100})}
+  /* ---- profile, 2FA, complaints ---- */
+  if(url==='/api/profile'&&method==='PUT'){const u=need();if(body.riskTolerance!==undefined){if(!['low','medium','high'].includes(body.riskTolerance))throw sErr('bad_input');u.riskTol=body.riskTolerance}
+    if(body.experience!==undefined){if(!['beginner','intermediate','expert'].includes(body.experience))throw sErr('bad_input');u.exp=body.experience}return done({ok:true})}
+  if(url==='/api/2fa/setup'){const u=need();if(u.totp)throw sErr('kyc_locked');u.totpSecret=b32enc(crypto.getRandomValues(new Uint8Array(20)));
+    return done({secret:u.totpSecret,uri:`otpauth://totp/TamweelShares:${encodeURIComponent(u.email)}?secret=${u.totpSecret}&issuer=TamweelShares`,demoCode:await totpAt(u.totpSecret,Math.floor(Date.now()/30000))})}
+  if(url==='/api/2fa/enable'){const u=need();if(!u.totpSecret||!await totpValid(u.totpSecret,body.code))throw sErr('bad_code');u.totp=true;sAudit(u.id,'2fa.enabled','user',u.id);return done({ok:true})}
+  if(url==='/api/2fa/disable'){const u=need();if(!u.totp||u.pass!==body.password||!await totpValid(u.totpSecret,body.code))throw sErr('bad_code');u.totp=false;u.totpSecret=null;sAudit(u.id,'2fa.disabled','user',u.id);return done({ok:true})}
+  if(url==='/api/complaints'&&method==='POST'){const u=need();const c={id:sId(),uid:u.id,subject:sStr(body.subject,3,150),body:sStr(body.body,10,3000),status:'open',reply:null,created:sNow()};S.complaints.push(c);sAudit(u.id,'complaint.created','complaint',c.id);return done({id:c.id})}
+  if(url==='/api/complaints/mine')return S.complaints.filter(c=>c.uid===need().id).slice().reverse();
+  /* ---- admin ---- */
+  if(url.startsWith('/api/admin/')){need('admin');
+    if(url==='/api/admin/overview'){const inv=S.inv,tot=inv.reduce((a,i)=>a+i.amount,0);
+      return{investors:S.users.filter(u=>u.role==='investor').length,owners:S.users.filter(u=>u.role==='owner').length,kycPending:S.users.filter(u=>u.kyc==='pending').length,
+        projectsPending:S.projects.filter(p=>p.status==='pending').length,projectsApproved:S.projects.filter(p=>p.status==='approved').length,projectsRejected:S.projects.filter(p=>p.status==='rejected').length,
+        totalRaised:tot/100,avgInvestment:inv.length?Math.round(tot/inv.length)/100:0,totalPaidOut:S.tx.filter(x=>x.type==='income').reduce((a,x)=>a+x.amount,0)/100,
+        withdrawalsPending:S.wd.filter(w=>w.status==='pending').length,walletLiability:S.tx.reduce((a,x)=>a+x.amount,0)/100}}
+    if(url==='/api/admin/users')return S.users.slice().reverse().map(u=>({id:u.id,name:u.name,email:u.email,role:u.role,phone:u.phone,kyc_status:u.kyc,created:u.created}));
+    if(url==='/api/admin/kyc')return S.users.filter(u=>u.kyc==='pending').map(u=>({id:u.id,name:u.name,email:u.email,phone:u.phone,national_id:u.nid,kyc_status:u.kyc,created:u.created,documents:S.docs.filter(d=>d.uid===u.id&&!d.pid).map(d=>({id:d.id,kind:d.kind,filename:d.filename,size:d.size,created:d.created}))}));
+    if(m=url.match(/^\/api\/admin\/kyc\/(\d+)$/)){const u=sUser(+m[1]);if(!u||u.kyc!=='pending'||!['approved','rejected'].includes(body.decision))throw sErr('bad_input');u.kyc=body.decision;u.kycNote=body.note||null;sAudit(cur.id,'kyc.'+body.decision,'user',u.id,{note:u.kycNote});sNotify(u.id,'kyc_'+body.decision,null,{note:u.kycNote||''});return done({ok:true})}
+    if(url==='/api/admin/projects'&&method==='GET')return S.projects.slice().reverse().map(p=>({...sProj(p,true),ownerName:sUser(p.oid).name,ownerEmail:sUser(p.oid).email,analysis:(()=>{const a=sAnalysis(p.id);return{n:a.n,rating:a.rating,flags:a.flags,rows:a.rows}})()}));
+    if(m=url.match(/^\/api\/admin\/projects\/(\d+)\/review$/)){const p=S.projects.find(x=>x.id===+m[1]);if(!p||!['approved','rejected'].includes(body.decision))throw sErr('bad_input');
+      const risk=['low','medium','high'].includes(body.risk)?body.risk:'unrated';if(body.decision==='approved'&&risk==='unrated')throw sErr('risk_required');
+      const old={status:p.status,risk:p.risk};p.status=body.decision;p.risk=risk;p.vNote=body.verificationNote||null;p.aNote=body.adminNote||null;sAudit(cur.id,'project.'+body.decision,'project',p.id,{old,risk});
+      sNotify(p.oid,'project_'+body.decision,p.id,{note:p.aNote||''});
+      if(body.decision==='approved'&&old.status!=='approved')S.users.filter(u=>u.role==='investor'&&u.kyc==='approved').forEach(u=>sNotify(u.id,'new_project',p.id));
+      if(body.decision==='approved'&&old.status==='approved'&&old.risk!==risk)sAudience(p.id).forEach(x=>sNotify(x,'risk_changed',p.id,{risk}));return done({ok:true})}
+    if(m=url.match(/^\/api\/admin\/projects\/(\d+)\/financials\/verify$/)){const pid=+m[1];(body.months||[]).forEach(mo=>{if(S.fin[pid]&&S.fin[pid][mo])S.fin[pid][mo].verified=!!body.verified});sAudit(cur.id,body.verified?'financials.verified':'financials.unverified','project',pid,{months:body.months});return done({ok:true})}
+    if(url==='/api/admin/withdrawals'&&method==='GET')return S.wd.slice().sort((a,b)=>(b.status==='pending')-(a.status==='pending')||b.id-a.id).map(w=>({id:w.id,amount:w.amount/100,destination:w.dest,status:w.status,created:w.created,name:sUser(w.uid).name,email:sUser(w.uid).email}));
+    if(m=url.match(/^\/api\/admin\/withdrawals\/(\d+)$/)){const w=S.wd.find(x=>x.id===+m[1]&&x.status==='pending');if(!w||!['paid','rejected'].includes(body.decision))throw sErr('bad_input');w.status=body.decision;
+      if(body.decision==='rejected')sTxAdd(w.uid,'refund',w.amount,null,'withdrawal #'+w.id);sAudit(cur.id,'withdrawal.'+body.decision,'withdrawal',w.id,{amount:w.amount/100});sNotify(w.uid,'withdrawal_'+body.decision,null,{amount:w.amount/100});return done({ok:true})}
+    if(url==='/api/admin/transactions')return S.tx.slice().reverse().slice(0,300).map(x=>({id:x.id,type:x.type,amount:x.amount/100,note:x.note,date:x.created,user:sUser(x.uid).name,project:(S.projects.find(p=>p.id===x.pid)||{}).title||null}));
+    if(url==='/api/admin/audit')return S.audit.slice().reverse().slice(0,300).map(a=>({id:a.id,action:a.action,entity:a.entity,entity_id:a.entity_id,detail:a.detail,created:a.created,actor:(sUser(a.actor_id)||{}).name||null}));
+    if(url==='/api/admin/exits'&&method==='GET')return S.exits.filter(e=>['pending','open'].includes(e.status)).slice().reverse().map(e=>({...sExitOut(e),seller:sUser(e.sid).name}));
+    if(m=url.match(/^\/api\/admin\/exits\/(\d+)$/)){const e=S.exits.find(x=>x.id===+m[1]&&x.status==='pending');if(!e||!['approved','rejected'].includes(body.decision))throw sErr('bad_input');e.status=body.decision==='approved'?'open':'rejected';sAudit(cur.id,'exit.'+body.decision,'exit',e.id);sNotify(e.sid,'exit_'+body.decision,e.pid);return done({ok:true})}
+    if(url==='/api/admin/complaints'&&method==='GET')return S.complaints.slice().sort((a,b)=>(b.status==='open')-(a.status==='open')||b.id-a.id).map(c=>({...c,user_id:c.uid,name:sUser(c.uid).name}));
+    if(m=url.match(/^\/api\/admin\/complaints\/(\d+)$/)){const c=S.complaints.find(x=>x.id===+m[1]);if(!c)throw sErr('not_found');c.status='resolved';c.reply=sStr(body.reply,1,2000);sAudit(cur.id,'complaint.resolved','complaint',c.id);sNotify(c.uid,'complaint_resolved');return done({ok:true})}
+  }
   throw sErr('not_found');
 }
 
@@ -428,7 +595,7 @@ function go(h){if(location.hash===h)render();else location.hash=h}
 function nav(){
   $('#nav').innerHTML=`<a class="logo" href="#/">${lang==='ar'?'تمويل <span>شيرز</span>':'Tamweel <span>Shares</span>'}</a>
    <a href="#/">${t('projects')}</a><a href="#/compare">${t('navCompare')}${cmpGet().length?' ('+cmpGet().length+')':''}</a><a href="#/academy">${t('navAcademy')}</a>`+(me?
-   `<a href="#/dashboard">${t('dash')}</a>${me.role==='investor'&&!STATIC?`<a href="#/market">${t('navMarket')}</a>`:''}${me.role==='owner'?`<a href="#/simulator">${t('navSim')}</a>`:''}${me.role!=='admin'&&!STATIC?`<a href="#/account">${t('navAccount')}</a>`:''}${!STATIC?`<a href="#/notifications" title="${t('notifH')}">🔔${unread?`<b style="color:#b91c1c"> ${unread}</b>`:''}</a>`:''}<span class="mut">${esc(me.name)} · ${t(me.role)}</span><button class="btn ghost sm" onclick="logout()">${t('logout')}</button>`:
+   `<a href="#/dashboard">${t('dash')}</a>${me.role==='investor'?`<a href="#/market">${t('navMarket')}</a>`:''}${me.role==='owner'?`<a href="#/simulator">${t('navSim')}</a>`:''}${me.role!=='admin'?`<a href="#/account">${t('navAccount')}</a>`:''}${true?`<a href="#/notifications" title="${t('notifH')}">🔔${unread?`<b style="color:#b91c1c"> ${unread}</b>`:''}</a>`:''}<span class="mut">${esc(me.name)} · ${t(me.role)}</span><button class="btn ghost sm" onclick="logout()">${t('logout')}</button>`:
    `<a href="#/login">${t('login')}</a><a class="btn sm" href="#/signup">${t('signup')}</a>`)+
    `<button class="btn ghost sm" onclick="setLang('${lang==='ar'?'en':'ar'}')">${t('langBtn')}</button>`;
 }
@@ -491,7 +658,7 @@ async function vProject(id){
    <form class="f" onsubmit="return buy(event,${p.id})">
    <label>${t('qty')} ${num(left)}, ${t('minInv')}: ${num(minS)})<input type="number" id="qty" min="${minS}" max="${left}" step="1" value="${minS}" required oninput="$('#cost').textContent=money(this.value*${p.sharePrice})"></label>
    <div class="row"><span>${t('total')}</span><b id="cost">${money(minS*p.sharePrice)}</b></div>
-   ${STATIC?'':signHtml()}<button class="btn">${t('confirm')}</button></form>`;
+   ${signHtml()}<button class="btn">${t('confirm')}</button></form>`;
   const kv=(k,v)=>!v?'':`<dt>${t(k)}</dt><dd>${v}</dd>`;
   const txt=(k,v)=>v?`<h3>${t(k)}</h3><p style="white-space:pre-line">${esc(v)}</p>`:'';
   const details=`<h3>${t('projInfo')}</h3><dl class="kv">${kv('location',esc(p.location))}${kv('founded',p.foundedYear&&num(p.foundedYear).replace(/[٬,]/g,''))}${kv('branches',p.branches!=null&&num(p.branches))}${kv('employees',p.employees!=null&&num(p.employees))}
@@ -505,13 +672,13 @@ async function vProject(id){
    <label>${t('calcMon')}<input type="number" id="c_mon" min="1" step="1" value="${p.durationMonths||12}" oninput="calcUpdate(${p.sharePrice},${p.totalShares})"></label></div>
    <div id="calcOut"></div><div class="warn">${t('calcWarn')}</div></div>`;
   window._post=()=>{if($('#c_amt'))calcUpdate(p.sharePrice,p.totalShares);loadExtras(p)};
-  let following=false;if(!STATIC&&me){try{following=(await api('GET','/api/follows')).includes(p.id)}catch(e){}}
+  let following=false;if(me){try{following=(await api('GET','/api/follows')).includes(p.id)}catch(e){}}
   return `<p><a href="#/">${t('back')}</a></p>${flash}<div class="two"><div><div class="card"><span class="tag">${catName(p.category)}</span>${p.risk?riskTag(p.risk):''}
   <h1 style="margin:8px 0">${esc(p.title)}</h1><p class="mut">${t('by')} ${esc(p.owner)} · ${t('listed')} ${fdate(p.created)}</p><p>${esc(p.description)}</p>
   <div class="prog"><i style="width:${pct(p)}%"></i></div>
   <div class="stats"><div class="stat"><small>${t('raised')}</small><b>${money(p.raised)}</b></div><div class="stat"><small>${t('goal')}</small><b>${money(p.goal)}</b></div>
   <div class="stat"><small>${t('sharePrice')}</small><b>${money(p.sharePrice)}</b></div><div class="stat"><small>${t('sharesLeft')}</small><b>${num(left)}/${num(p.totalShares)}</b></div></div>${details}</div>${calc}<div id="pExtra"></div></div>
-  <div><div class="card">${box}</div><p>${!STATIC&&me&&p.status==='approved'?`<button class="btn ghost sm" onclick="toggleFollow(${p.id},${following})">${t(following?'unfollow':'follow')}</button> `:''}<button class="btn ghost sm" onclick="cmpToggle(${p.id})">${cmpGet().includes(p.id)?t('compareDel'):t('compareAdd')}</button></p><div class="warn">${t('riskNote')}</div></div></div>`;
+  <div><div class="card">${box}</div><p>${me&&p.status==='approved'?`<button class="btn ghost sm" onclick="toggleFollow(${p.id},${following})">${t(following?'unfollow':'follow')}</button> `:''}<button class="btn ghost sm" onclick="cmpToggle(${p.id})">${cmpGet().includes(p.id)?t('compareDel'):t('compareAdd')}</button></p><div class="warn">${t('riskNote')}</div></div></div>`;
 }
 async function buy(e,id){
   e.preventDefault();const q=parseInt($('#qty').value);
@@ -574,7 +741,7 @@ async function uploadDoc(e,pid){
   catch(x){msg(errText(x),1)}
   render();return false;
 }
-const docLinks=l=>l.length?l.map(d=>`<a href="/api/documents/${d.id}" target="_blank" rel="noopener">${t('d_'+d.kind)}: ${esc(d.filename)}</a>`).join('<br>'):`<span class="mut">${t('noDocs')}</span>`;
+const docLinks=l=>l.length?l.map(d=>STATIC?`<span>${t('d_'+d.kind)}: ${esc(d.filename)} <span class="mut">(${t('demoFile')})</span></span>`:`<a href="/api/documents/${d.id}" target="_blank" rel="noopener">${t('d_'+d.kind)}: ${esc(d.filename)}</a>`).join('<br>'):`<span class="mut">${t('noDocs')}</span>`;
 
 /* investor dashboard + wallet */
 async function vInvestor(){
@@ -682,7 +849,7 @@ async function createProject(e){
   try{await api('POST','/api/projects',{title:f.title.value,category:f.cat.value,description:f.desc.value,goal:+f.goal.value,sharePrice:+f.price.value,
     location:v('location'),foundedYear:nn('founded'),branches:nn('branches'),employees:nn('employees'),monthlySales:nn('msales'),monthlyProfit:nn('mprofit'),
     minShares:nn('minShares'),durationMonths:nn('dur'),expectedReturn:nn('ret'),useOfFunds:v('uses'),profitTerms:v('profitT'),exitTerms:v('exitT')});
-   msg(t(STATIC?'published':'appSent'));go('#/dashboard')}catch(x){msg(errText(x),1);render()}
+   msg(t('appSent'));go('#/dashboard')}catch(x){msg(errText(x),1);render()}
   return false;
 }
 document.addEventListener('input',e=>{
@@ -741,7 +908,7 @@ async function toggleFollow(id,on){try{await api(on?'DELETE':'POST',`/api/projec
 async function loadExtras(p){
   const box=$('#pExtra');if(!box)return;let h='';
   try{const a=await api('GET',`/api/projects/${p.id}/analysis`);h+=analysisHtml(a)}catch(e){}
-  if(!STATIC){
+  if(true){
     try{const rep=await api('GET','/api/owners/'+p.ownerId+'/reputation');
       h+=`<div class="card" style="margin-top:16px"><h3 style="margin-top:0">${t('repH')}: ${esc(rep.name)}</h3><div class="stats">
       <div class="stat"><small>${t('repProj')}</small><b>${num(rep.projects)}</b></div><div class="stat"><small>${t('repRaised')}</small><b>${money(rep.raised)}</b></div>
@@ -789,7 +956,7 @@ const FINF=['revenue','cogs','direct','indirect','payroll','rent','utilities','c
 async function vManage(id){
   const p=await api('GET','/api/projects/'+id),a=await api('GET',`/api/projects/${id}/analysis`);
   let ai='',reports=[],posts=[],polls=[];
-  if(!STATIC){try{reports=await api('GET',`/api/projects/${id}/reports`)}catch(e){}try{posts=await api('GET',`/api/projects/${id}/posts`)}catch(e){}try{polls=await api('GET',`/api/projects/${id}/polls`)}catch(e){}}
+  {try{reports=await api('GET',`/api/projects/${id}/reports`)}catch(e){}try{posts=await api('GET',`/api/projects/${id}/posts`)}catch(e){}try{polls=await api('GET',`/api/projects/${id}/polls`)}catch(e){}}
   const docsAI=CFG.ai&&p.documents&&p.documents.length?`<div class="warn">${t('aiNote')}<br>${p.documents.map(d=>`<button class="btn ghost sm" style="margin:4px 0" onclick="aiFill(${d.id})">${t('aiRead')}: ${esc(d.filename)}</button>`).join(' ')}</div>`:'';
   return `<p><a href="#/dashboard">${t('backB')}</a></p>${flash}<h1>${t('manage')}: ${esc(p.title)}</h1>
   <div class="card"><h3 style="margin-top:0">${t('finEntry')}</h3>${docsAI}
@@ -799,7 +966,7 @@ async function vManage(id){
    <form class="f" style="max-width:none" onsubmit="return importCsv(event,${id})"><textarea name="csv" rows="5" class="ltr" placeholder="2026-01,20000,7000,1500,900,4200,1800,600,300,700,200,500,18000"></textarea><div><button class="btn sm">${t('importCsv')}</button></div></form></details>
    ${a.rows&&a.rows.length?`<div class="tw" style="margin-top:10px"><table><tr><th>${t('month')}</th><th>${t('revenue')}</th><th>${t('profit')}</th><th>${t('verifiedCol')}</th><th></th></tr>${a.series.map(r=>`<tr><td dir="ltr">${r.month}</td><td>${money(r.revenue)}</td><td>${money(r.profit)}</td><td>${r.verified?'✓':''}</td><td><button class="btn ghost sm" onclick="delMonth(${id},'${r.month}')">${t('del')}</button></td></tr>`).join('')}</table></div>`:''}</div>
   ${analysisHtml(a,{full:false})}
-  ${STATIC||p.status!=='approved'?'':`<div class="two eq" style="margin-top:16px"><div class="card"><h3 style="margin-top:0">${t('publishReport')}</h3>
+  ${p.status!=='approved'?'':`<div class="two eq" style="margin-top:16px"><div class="card"><h3 style="margin-top:0">${t('publishReport')}</h3>
    <form class="f" style="max-width:none" onsubmit="return saveReport(event,${id})"><label>${t('month')}<input name="month" type="month" required class="ltr"></label>
    <label>${t('rSummary')}<textarea name="summary" rows="3" required minlength="10" maxlength="3000"></textarea></label>
    <label>${t('rSales')}<input name="sales" type="number" min="0" step="0.01"></label><label>${t('rExp')}<input name="expenses" type="number" min="0" step="0.01"></label>
@@ -878,7 +1045,7 @@ async function vAccount(){
 }
 const badgeX=s=>`<span class="risk ${s==='sold'||s==='open'?'st-approved':s==='pending'?'st-pending':'st-rejected'}">${T['st_'+s]?t('st_'+s):T['s_'+s]?t('s_'+s):s}</span>`;
 async function saveProfile(e){e.preventDefault();try{await api('PUT','/api/profile',{riskTolerance:e.target.rt.value,experience:e.target.ex.value});await loadMe();msg(t('profSaved'))}catch(x){msg(errText(x),1)}render();return false}
-async function setup2fa(){try{const r=await api('POST','/api/2fa/setup',{});$('#tfa').innerHTML=`<p>${t('secSecret')}</p><p class="ltr" style="font-size:1.1rem;font-weight:700;letter-spacing:2px;word-break:break-all">${r.secret}</p>
+async function setup2fa(){try{const r=await api('POST','/api/2fa/setup',{});$('#tfa').innerHTML=`<p>${t('secSecret')}</p><p class="ltr" style="font-size:1.1rem;font-weight:700;letter-spacing:2px;word-break:break-all">${r.secret}</p>${r.demoCode?`<p class="mut">${t('demoCodeHint')} <b class="ltr">${r.demoCode}</b></p>`:''}
   <form class="f" style="max-width:none;grid-template-columns:1fr auto;align-items:end" onsubmit="return enable2fa(event)"><label>${t('code')}<input name="code" required maxlength="6" class="ltr"></label><button class="btn">${t('secEnable')}</button></form>`}catch(x){msg(errText(x),1);render()}}
 async function enable2fa(e){e.preventDefault();try{await api('POST','/api/2fa/enable',{code:e.target.code.value});await loadMe();msg(t('secDone'))}catch(x){msg(errText(x),1)}render();return false}
 async function disable2fa(e){e.preventDefault();try{await api('POST','/api/2fa/disable',{password:e.target.pw.value,code:e.target.code.value});await loadMe();msg(t('secOff'))}catch(x){msg(errText(x),1)}render();return false}
@@ -888,7 +1055,7 @@ async function sendComplaint(e){e.preventDefault();try{await api('POST','/api/co
 
 /* ----- notifications ----- */
 let unread=0;
-async function loadUnread(){if(STATIC||!me){unread=0;return}try{unread=(await api('GET','/api/notifications')).filter(n=>!n.read).length}catch(e){unread=0}}
+async function loadUnread(){if(!me){unread=0;return}try{unread=(await api('GET','/api/notifications')).filter(n=>!n.read).length}catch(e){unread=0}}
 function notifText(n){const d=n.data||{};return t('n_'+n.type,esc(n.project||''),n.type==='report'?d.month:money(d.amount||0),d.note||'')}
 async function vNotifs(){
   const l=await api('GET','/api/notifications');
@@ -899,7 +1066,7 @@ async function readAll(){try{await api('POST','/api/notifications/read',{})}catc
 /* ----- academy & recommendations ----- */
 function vAcademy(){return `<h1>${t('acH')}</h1><div class="grid">${[1,2,3,4,5,6].map(i=>`<div class="card"><h3 style="margin-top:0">${t('ac'+i+'t')}</h3><p>${t('ac'+i)}</p></div>`).join('')}</div><div class="warn">${t('riskNote')}</div>`}
 async function recsHtml(){
-  if(STATIC||!me||me.role!=='investor')return '';
+  if(!me||me.role!=='investor')return '';
   try{const d=await api('GET','/api/investor/dashboard'),held=new Set(d.holdings.map(h=>h.id)),heldCats=new Set(homeList.filter(p=>held.has(p.id)).map(p=>p.category));
     const rank={low:1,medium:2,high:3},tol=rank[me.riskTolerance||'medium'];
     const sc=p=>(p.risk&&rank[p.risk]===tol?3:p.risk&&rank[p.risk]<tol?1:0)+(heldCats.has(p.category)?0:2)+(p.sold/p.totalShares>.5?1:0);
