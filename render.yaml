@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: tamweel-shares
+    runtime: docker
+    plan: starter            # persistent disks need a paid plan
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TRUST_PROXY
+        value: "1"
+      - key: DB_PATH
+        value: /data/tamweel.db
+      # Demo top-up button. Remove this line once a real payment provider is connected.
+      - key: ALLOW_DEMO_DEPOSIT
+        value: "1"
+    disk:
+      name: tamweel-data
+      mountPath: /data
+      sizeGB: 1
