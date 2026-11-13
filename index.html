@@ -39,9 +39,12 @@ h2{margin:24px 0 12px}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px}
 .stat small{color:var(--mut);display:block}
 .stat b{font-size:1.5rem}
+.wallet{background:linear-gradient(135deg,#0f172a,#134e4a);color:#fff;border:0}
+.wallet .big{font-size:2.2rem;font-weight:800}
+.wallet .mut{color:#cbd5e1}
 form.f{display:grid;gap:12px;max-width:420px}
 label{font-size:.85rem;font-weight:600;display:grid;gap:4px}
-input,select,textarea{font:inherit;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fff;width:100%}
+input,select,textarea{font:inherit;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);width:100%}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--g2);border-color:var(--g2)}
 table{width:100%;border-collapse:collapse;font-size:.92rem}
 th,td{text-align:start;padding:9px 8px;border-bottom:1px solid var(--line)}
@@ -50,12 +53,15 @@ th{color:var(--mut);font-weight:600;font-size:.8rem}
 .msg{padding:10px 14px;border-radius:10px;margin:10px 0;background:#ecfdf5;color:#065f46}
 .msg.err{background:#fef2f2;color:#991b1b}
 .two{display:grid;grid-template-columns:1.4fr 1fr;gap:18px}
-@media(max-width:760px){.two{grid-template-columns:1fr}.hero h1{font-size:1.6rem}}
+.two.eq{grid-template-columns:1fr 1fr}
+@media(max-width:760px){.two,.two.eq{grid-template-columns:1fr}.hero h1{font-size:1.6rem}}
 .seg{display:flex;gap:8px}
 .seg label{flex:1;border:1.5px solid var(--line);border-radius:10px;padding:10px;text-align:center;cursor:pointer;font-weight:600}
 .seg input{display:none}
 .seg label:has(input:checked){border-color:var(--g);background:#ccfbf1;color:var(--g)}
 .pos{color:#047857;font-weight:700}
+.neg{color:#b91c1c;font-weight:700}
+.ltr{direction:ltr;unicode-bidi:plaintext;text-align:start}
 </style>
 </head>
 <body>
@@ -76,51 +82,40 @@ const T={
  logout:{ar:'تسجيل الخروج',en:'Log out'},
  langBtn:{ar:'English',en:'العربية'},
  heroH:{ar:'امتلك حصة في مشاريع تؤمن بها',en:'Own a share in projects you believe in'},
- heroP:{ar:'موّل مشاريع حقيقية، واحصل على أسهم، واستلم نصيبك من الدخل. بسيط وشفاف وكل شيء في مكان واحد.',en:'Fund real projects, receive shares, and get your part of the income. Simple, transparent, tracked in one place.'},
+ heroP:{ar:'موّل مشاريع حقيقية، واحصل على أسهم، واستلم نصيبك من الدخل في محفظتك. بسيط وشفاف وكل شيء في مكان واحد.',en:'Fund real projects, receive shares, and get your part of the income in your wallet. Simple, transparent, tracked in one place.'},
  start:{ar:'ابدأ الآن',en:'Get started'},
  s1:{ar:'١. اختر مشروعًا',en:'1. Pick a project'},s1d:{ar:'تصفح المشاريع التي تبحث عن تمويل.',en:'Browse projects looking for funding.'},
  s2:{ar:'٢. اشترِ أسهمًا',en:'2. Buy shares'},s2d:{ar:'حدد عدد الأسهم التي تريدها.',en:'Choose how many shares you want.'},
- s3:{ar:'٣. اكسب دخلًا',en:'3. Earn income'},s3d:{ar:'استلم نصيبك عندما يحقق المشروع أرباحًا.',en:'Get paid your part when the project earns.'},
+ s3:{ar:'٣. اكسب واسحب',en:'3. Earn & withdraw'},s3d:{ar:'يصل نصيبك من الدخل إلى محفظتك ويمكنك سحبه.',en:'Your income lands in your wallet and you can withdraw it.'},
  open:{ar:'المشاريع المفتوحة',en:'Open projects'},
  none:{ar:'لا توجد مشاريع بعد.',en:'No projects yet.'},
- of:{ar:'من',en:'of'},
- perShare:{ar:'للسهم',en:'/ share'},
- left:{ar:'سهم متبقٍ',en:'shares left'},
+ of:{ar:'من',en:'of'},perShare:{ar:'للسهم',en:'/ share'},left:{ar:'سهم متبقٍ',en:'shares left'},
  viewInvest:{ar:'عرض واستثمار',en:'View & invest'},
  notFound:{ar:'المشروع غير موجود.',en:'Project not found.'},
  needLogin:{ar:'سجّل الدخول كمستثمر لشراء الأسهم.',en:'Log in as an investor to buy shares.'},
  ownerNote:{ar:'أنت مسجل كصاحب مشروع. استخدم حساب مستثمر لشراء الأسهم.',en:'You are logged in as a project owner. Use an investor account to buy shares.'},
  openDash:{ar:'افتح لوحتي',en:'Open my dashboard'},
  funded:{ar:'تم اكتمال التمويل 🎉',en:'Fully funded 🎉'},
- youHold:{ar:'أنت تملك حاليًا',en:'You already hold'},
- sharesW:{ar:'سهم',en:'shares'},
- buyH:{ar:'اشترِ أسهمًا',en:'Buy shares'},
- qty:{ar:'عدد الأسهم (الحد الأقصى',en:'Number of shares (max'},
- total:{ar:'التكلفة الإجمالية',en:'Total cost'},
- confirm:{ar:'تأكيد الاستثمار',en:'Confirm investment'},
- demo:{ar:'نسخة تجريبية: لا يتم سحب أي مبلغ حقيقي.',en:'Demo mode: no real payment is taken.'},
- back:{ar:'→ كل المشاريع',en:'← All projects'},
- backB:{ar:'→ رجوع',en:'← Back'},
+ youHold:{ar:'أنت تملك حاليًا',en:'You already hold'},sharesW:{ar:'سهم',en:'shares'},
+ buyH:{ar:'اشترِ أسهمًا',en:'Buy shares'},qty:{ar:'عدد الأسهم (الحد الأقصى',en:'Number of shares (max'},
+ total:{ar:'التكلفة الإجمالية',en:'Total cost'},confirm:{ar:'تأكيد الاستثمار',en:'Confirm investment'},
+ walletBal:{ar:'رصيد محفظتك',en:'Your wallet balance'},
+ back:{ar:'→ كل المشاريع',en:'← All projects'},backB:{ar:'→ رجوع',en:'← Back'},
  by:{ar:'بواسطة',en:'By'},listed:{ar:'نُشر في',en:'listed'},
  raised:{ar:'المبلغ المجمّع',en:'Raised'},goal:{ar:'الهدف',en:'Goal'},
  sharePrice:{ar:'سعر السهم',en:'Share price'},sharesLeft:{ar:'الأسهم المتبقية',en:'Shares left'},
- badQty:{ar:'عدد الأسهم غير صحيح.',en:'Invalid number of shares.'},
- bought:{ar:'تم! اشتريت %1 سهمًا بمبلغ %2.',en:'Done! You bought %1 shares for %2.'},
+ bought:{ar:'تم! اشتريت %1 سهمًا.',en:'Done! You bought %1 shares.'},
  createAcc:{ar:'إنشاء حساب',en:'Create account'},
  wantInvest:{ar:'أريد الاستثمار',en:'I want to invest'},ownProject:{ar:'أملك مشروعًا',en:'I own a project'},
- fullName:{ar:'الاسم الكامل',en:'Full name'},email:{ar:'البريد الإلكتروني',en:'Email'},pass:{ar:'كلمة المرور',en:'Password'},
+ fullName:{ar:'الاسم الكامل',en:'Full name'},email:{ar:'البريد الإلكتروني',en:'Email'},pass:{ar:'كلمة المرور (٨ أحرف على الأقل)',en:'Password (min. 8 characters)'},
  haveAcc:{ar:'لديك حساب؟',en:'Have an account?'},newHere:{ar:'مستخدم جديد؟',en:'New here?'},
- demoHint:{ar:'تجريبي: investor@demo.com أو owner@demo.com · كلمة المرور demo123',en:'Demo: investor@demo.com or owner@demo.com · password demo123'},
- emailUsed:{ar:'البريد الإلكتروني مسجل مسبقًا.',en:'Email already registered.'},
- wrong:{ar:'البريد أو كلمة المرور غير صحيحة.',en:'Wrong email or password.'},
  hello:{ar:'مرحبًا،',en:'Hello,'},
- invested:{ar:'إجمالي الاستثمار',en:'Total invested'},income:{ar:'الدخل المستلم',en:'Income received'},
+ invested:{ar:'إجمالي الاستثمار',en:'Total invested'},income:{ar:'إجمالي الدخل',en:'Total income'},
  projCount:{ar:'المشاريع',en:'Projects'},ret:{ar:'العائد حتى الآن',en:'Return so far'},
  myShares:{ar:'أسهمي',en:'My shares'},project:{ar:'المشروع',en:'Project'},shares:{ar:'الأسهم',en:'Shares'},
  ownership:{ar:'نسبة الملكية',en:'Ownership'},investedCol:{ar:'المستثمر',en:'Invested'},incomeCol:{ar:'الدخل',en:'Income'},
  noShares:{ar:'ليس لديك أسهم بعد.',en:'You have no shares yet.'},browse:{ar:'تصفح المشاريع',en:'Browse projects'},
- hist:{ar:'سجل الدخل',en:'Income history'},date:{ar:'التاريخ',en:'Date'},note:{ar:'ملاحظة',en:'Note'},received:{ar:'استلمت',en:'You received'},
- noIncome:{ar:'لا يوجد دخل بعد.',en:'No income yet.'},
+ date:{ar:'التاريخ',en:'Date'},note:{ar:'ملاحظة',en:'Note'},
  ownerDash:{ar:'لوحة صاحب المشروع',en:'Owner dashboard'},totalRaised:{ar:'إجمالي التمويل',en:'Total funds raised'},
  investors:{ar:'المستثمرون',en:'Investors'},paidOut:{ar:'الدخل الموزّع',en:'Income paid out'},myProjects:{ar:'مشاريعي',en:'My projects'},
  newProj:{ar:'+ مشروع جديد',en:'+ New project'},noOwn:{ar:'ليس لديك مشاريع بعد. أنشئ مشروعك الأول.',en:'You have no projects yet. Create your first one.'},
@@ -129,169 +124,267 @@ const T={
  noInv:{ar:'لا يوجد مستثمرون بعد.',en:'No investors yet.'},payHist:{ar:'سجل التوزيعات',en:'Payout history'},
  shareInc:{ar:'وزّع الدخل على المستثمرين',en:'Share income with investors'},amtDist:{ar:'المبلغ المراد توزيعه ($)',en:'Amount to distribute ($)'},
  notePh:{ar:'مثال: أرباح أكتوبر',en:'e.g. October profit'},distBtn:{ar:'وزّع حسب الأسهم',en:'Distribute by shares'},
- distNote:{ar:'يُقسَّم المبلغ تلقائيًا بين جميع المساهمين حسب عدد أسهمهم.',en:'Split automatically between all shareholders, based on shares held.'},
- incomeDef:{ar:'دخل',en:'Income'},distDone:{ar:'تم توزيع %1 على %2 مستثمر.',en:'%1 distributed to %2 investor(s).'},
+ distNote:{ar:'يُقسَّم المبلغ تلقائيًا بين جميع المساهمين حسب عدد أسهمهم ويُضاف إلى محافظهم.',en:'Split automatically between all shareholders by shares held, and credited to their wallets.'},
+ distDone:{ar:'تم توزيع %1 على %2 مستثمر.',en:'%1 distributed to %2 investor(s).'},
  newH:{ar:'مشروع جديد',en:'New project'},pname:{ar:'اسم المشروع',en:'Project name'},cat:{ar:'التصنيف',en:'Category'},
  desc:{ar:'الوصف',en:'Description'},descPh:{ar:'فيمَ سيُستخدم المال وكيف سيحقق دخلًا؟',en:'What will the money be used for and how will it earn income?'},
  goalIn:{ar:'هدف التمويل ($)',en:'Funding goal ($)'},priceIn:{ar:'سعر السهم ($)',en:'Price per share ($)'},
  publish:{ar:'نشر المشروع',en:'Publish project'},published:{ar:'تم نشر المشروع!',en:'Project published!'},
- priceErr:{ar:'سعر السهم لا يمكن أن يتجاوز الهدف.',en:'Share price cannot exceed the goal.'},
  calc:{ar:'= %1 سهم متاح للمستثمرين.',en:'= %1 shares available for investors.'},
+ /* wallet */
+ wallet:{ar:'المحفظة',en:'Wallet'},available:{ar:'الرصيد المتاح للسحب',en:'Available balance'},
+ addFunds:{ar:'إضافة رصيد (تجريبي)',en:'Add funds (demo)'},addBtn:{ar:'إضافة',en:'Add'},
+ withdrawH:{ar:'سحب الأموال',en:'Withdraw money'},wdAmount:{ar:'المبلغ ($)',en:'Amount ($)'},
+ wdDest:{ar:'الحساب البنكي / IBAN',en:'Bank account / IBAN'},wdBtn:{ar:'اطلب السحب',en:'Request withdrawal'},
+ wdAll:{ar:'سحب الكل',en:'Withdraw all'},
+ wdDone:{ar:'تم تسجيل طلب السحب. الرصيد الجديد: %1',en:'Withdrawal requested. New balance: %1'},
+ depDone:{ar:'تمت إضافة الرصيد. الرصيد الجديد: %1',en:'Funds added. New balance: %1'},
+ txH:{ar:'سجل المحفظة',en:'Wallet history'},noTx:{ar:'لا توجد عمليات بعد.',en:'No transactions yet.'},
+ tx_deposit:{ar:'إيداع',en:'Deposit'},tx_invest:{ar:'استثمار',en:'Investment'},tx_income:{ar:'دخل',en:'Income'},tx_withdraw:{ar:'سحب',en:'Withdrawal'},
+ type:{ar:'النوع',en:'Type'},
+ staticNote:{ar:'نسخة تجريبية: البيانات محفوظة في متصفحك فقط. حسابات التجربة: investor@demo.com / owner@demo.com — كلمة المرور demo12345',en:'Demo version: data is saved in your browser only. Demo accounts: investor@demo.com / owner@demo.com — password demo12345'},
+ demoWallet:{ar:'نسخة تجريبية: لا توجد بوابة دفع حقيقية، والسحب يُسجَّل فقط.',en:'Demo: no real payment gateway; withdrawals are only recorded.'},
+ /* errors */
+ e_email_used:{ar:'البريد الإلكتروني مسجل مسبقًا.',en:'Email already registered.'},
+ e_bad_login:{ar:'البريد أو كلمة المرور غير صحيحة.',en:'Wrong email or password.'},
+ e_bad_input:{ar:'يرجى التحقق من البيانات المدخلة.',en:'Please check the values you entered.'},
+ e_no_funds:{ar:'رصيد المحفظة غير كافٍ.',en:'Not enough balance in your wallet.'},
+ e_not_enough_shares:{ar:'عدد الأسهم المتاحة أقل من المطلوب.',en:'Not enough shares left.'},
+ e_no_investors:{ar:'لا يوجد مستثمرون لتوزيع الدخل عليهم.',en:'There are no investors to pay yet.'},
+ e_forbidden:{ar:'غير مسموح لك بهذا الإجراء.',en:'You are not allowed to do this.'},
+ e_unauth:{ar:'يرجى تسجيل الدخول.',en:'Please log in.'},
+ e_rate_limited:{ar:'محاولات كثيرة، حاول لاحقًا.',en:'Too many attempts, try again later.'},
+ e_not_found:{ar:'غير موجود.',en:'Not found.'},
+ e_server:{ar:'حدث خطأ في الخادم.',en:'Server error.'},
  c_agri:{ar:'زراعة',en:'Agriculture'},c_food:{ar:'أغذية ومشروبات',en:'Food & Drink'},c_energy:{ar:'طاقة',en:'Energy'},
  c_real:{ar:'عقارات',en:'Real Estate'},c_tech:{ar:'تقنية',en:'Technology'},c_retail:{ar:'تجارة',en:'Retail'},c_other:{ar:'أخرى',en:'Other'}
 };
 function t(k,...a){let s=(T[k]||{})[lang]||k;a.forEach((v,i)=>s=s.replace('%'+(i+1),v));return s}
-const L=v=>v&&typeof v==='object'?v[lang]:v;           // bilingual (seed) or plain text
 const CATS=['agri','food','energy','real','tech','retail','other'];
 function setLang(l){lang=l;try{localStorage.setItem('tw_lang',l)}catch(e){}applyLang();render()}
 function applyLang(){document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr'}
 
-/* ---------- tiny local "database" (browser localStorage) ---------- */
-const KEY='tamweel_shares_v2';
-let db=load();
-function uid(){return Math.random().toString(36).slice(2,10)}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}}
-function load(){
-  try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.users)return d}catch(e){}
-  const o={id:'u_owner',name:{ar:'صاحب مشروع تجريبي',en:'Demo Owner'},email:'owner@demo.com',pass:'demo123',role:'owner'};
-  const i={id:'u_inv',name:{ar:'مستثمر تجريبي',en:'Demo Investor'},email:'investor@demo.com',pass:'demo123',role:'investor'};
-  const d={users:[o,i],session:null,investments:[],payouts:[],projects:[
-    {id:'p1',ownerId:o.id,cat:'agri',title:{ar:'مزرعة الوادي الأخضر للزيتون',en:'Green Valley Olive Farm'},desc:{ar:'توسعة مزرعة الزيتون العائلية بمعصرة جديدة و٢٠٠٠ شجرة إضافية. يأتي الدخل من بيع زيت الزيتون الفاخر محليًا وخارجيًا.',en:'Expanding our family olive farm with a new press and 2,000 more trees. Revenue comes from selling premium olive oil locally and abroad.'},goal:50000,sharePrice:100,date:Date.now()-864e5*20},
-    {id:'p2',ownerId:o.id,cat:'food',title:{ar:'محمصة قهوة المدينة',en:'City Coffee Roastery'},desc:{ar:'محمصة قهوة تزوّد ٣٠ مقهى في الحي. تُستخدم الأموال لشراء آلة تحميص ثانية وخط تغليف.',en:'A neighbourhood coffee roastery supplying 30 cafés. Funds go to a second roasting machine and packaging line.'},goal:30000,sharePrice:50,date:Date.now()-864e5*9},
-    {id:'p3',ownerId:o.id,cat:'energy',title:{ar:'ألواح شمسية لمدرسة النور',en:'Solar Panels for Al-Noor School'},desc:{ar:'تركيب ألواح شمسية على السطح وبيع فائض الكهرباء للشبكة. يُوزَّع الدخل من مبيعات الطاقة الشهرية.',en:'Install rooftop solar and sell surplus power to the grid. Income is shared from monthly energy sales.'},goal:80000,sharePrice:200,date:Date.now()-864e5*3}
-  ]};
-  d.investments.push({id:uid(),projectId:'p1',userId:i.id,shares:120,date:Date.now()-864e5*15});
-  d.investments.push({id:uid(),projectId:'p2',userId:i.id,shares:80,date:Date.now()-864e5*5});
-  d.payouts.push({id:uid(),projectId:'p1',amount:1200,note:{ar:'مبيعات الزيت للربع الثالث',en:'Q3 oil sales'},date:Date.now()-864e5*4,splits:{[i.id]:1200}});
-  try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){}return d;
+/* ---------- static (no-server) mode ----------
+   On a static host such as GitHub Pages there is no /api, so the very same API is
+   emulated on top of localStorage. This is a DEMO: data lives only in this browser. */
+let STATIC=false,S=null;
+const MK='tw_static_v3';
+const sErr=c=>{const e=new Error(c);e.code=c;return e};
+const sSave=()=>{try{localStorage.setItem(MK,JSON.stringify(S))}catch(e){}};
+const sId=()=>++S.n;
+const sBal=u=>S.tx.filter(x=>x.uid===u).reduce((a,x)=>a+x.amount,0);
+const sCts=(v,min,max)=>{const n=Number(v);if(!Number.isFinite(n)||n<min||n>max)throw sErr('bad_input');return Math.round(n*100)};
+const sSold=p=>S.inv.filter(x=>x.pid===p.id).reduce((a,x)=>a+x.shares,0);
+const sTxAdd=(uid,type,amount,pid,note)=>S.tx.push({id:sId(),uid,type,amount,pid:pid||null,note:note||null,created:Date.now()});
+function sProj(p){const u=S.users.find(x=>x.id===p.oid),s=sSold(p);
+  return{id:p.id,title:p.title,category:p.category,description:p.description,owner:u?u.name:'',sharePrice:p.price/100,totalShares:p.total,sold:s,goal:p.price*p.total/100,raised:p.price*s/100,created:p.created}}
+function sAddProject(oid,b){const price=sCts(b.sharePrice,1,1e6),goal=sCts(b.goal,100,1e8),total=Math.floor(goal/price);
+  if(total<1||total>1e6||!CATS.includes(b.category)||String(b.title).trim().length<3||String(b.description).trim().length<10)throw sErr('bad_input');
+  const p={id:sId(),oid,title:String(b.title).trim(),category:b.category,description:String(b.description).trim(),price,total,created:Date.now()};S.projects.push(p);return p}
+function sBuy(u,pid,shares){const p=S.projects.find(x=>x.id===pid);if(!p)throw sErr('not_found');
+  if(!Number.isInteger(shares)||shares<1)throw sErr('bad_input');
+  if(shares>p.total-sSold(p))throw sErr('not_enough_shares');
+  const cost=shares*p.price;if(sBal(u.id)<cost)throw sErr('no_funds');
+  S.inv.push({id:sId(),pid,uid:u.id,shares,amount:cost,created:Date.now()});sTxAdd(u.id,'invest',-cost,pid);return sBal(u.id)/100}
+function sPayout(owner,pid,amt,note){const p=S.projects.find(x=>x.id===pid&&x.oid===owner.id);if(!p)throw sErr('not_found');
+  const m={};S.inv.filter(x=>x.pid===pid).forEach(x=>m[x.uid]=(m[x.uid]||0)+x.shares);
+  const h=Object.entries(m).map(([uid,sh])=>({uid:+uid,sh})).sort((a,b)=>b.sh-a.sh);if(!h.length)throw sErr('no_investors');
+  const sold=sSold(p);let given=0;h.forEach(x=>{x.c=Math.floor(amt*x.sh/sold);given+=x.c});h[0].c+=amt-given;
+  S.payouts.push({id:sId(),pid,amount:amt,note,created:Date.now()});h.forEach(x=>x.c>0&&sTxAdd(x.uid,'income',x.c,pid,note));return h.length}
+function sLoad(){
+  try{const d=JSON.parse(localStorage.getItem(MK));if(d&&d.users){S=d;return}}catch(e){}
+  S={n:100,session:null,users:[],projects:[],inv:[],payouts:[],tx:[]};
+  const o={id:sId(),name:'صاحب مشروع تجريبي',email:'owner@demo.com',pass:'demo12345',role:'owner'};
+  const i={id:sId(),name:'مستثمر تجريبي',email:'investor@demo.com',pass:'demo12345',role:'investor'};S.users.push(o,i);
+  const a=sAddProject(o.id,{title:'مزرعة الوادي الأخضر للزيتون',category:'agri',goal:50000,sharePrice:100,description:'توسعة مزرعة الزيتون العائلية بمعصرة جديدة و٢٠٠٠ شجرة إضافية. يأتي الدخل من بيع زيت الزيتون الفاخر.'});
+  const b=sAddProject(o.id,{title:'محمصة قهوة المدينة',category:'food',goal:30000,sharePrice:50,description:'محمصة قهوة تزوّد ٣٠ مقهى في الحي. تُستخدم الأموال لشراء آلة تحميص ثانية وخط تغليف.'});
+  sAddProject(o.id,{title:'ألواح شمسية لمدرسة النور',category:'energy',goal:80000,sharePrice:200,description:'تركيب ألواح شمسية على السطح وبيع فائض الكهرباء للشبكة. يُوزَّع الدخل من مبيعات الطاقة الشهرية.'});
+  sTxAdd(i.id,'deposit',2500000);sBuy(i,a.id,120);sBuy(i,b.id,80);sPayout(o,a.id,120000,'مبيعات الزيت للربع الثالث');sSave();
 }
+async function staticApi(method,url,body){
+  body=body||{};if(!S)sLoad();const cur=S.users.find(u=>u.id===S.session)||null;let m;
+  const need=role=>{if(!cur)throw sErr('unauth');if(role&&cur.role!==role)throw sErr('forbidden');return cur};
+  const done=v=>{sSave();return v};
+  if(url==='/api/signup'&&method==='POST'){
+    const name=String(body.name||'').trim(),email=String(body.email||'').trim().toLowerCase(),pw=String(body.password||'');
+    if(name.length<2||!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)||pw.length<8||!['investor','owner'].includes(body.role))throw sErr('bad_input');
+    if(S.users.some(u=>u.email===email))throw sErr('email_used');
+    const u={id:sId(),name,email,pass:pw,role:body.role};S.users.push(u);S.session=u.id;return done({ok:true})}
+  if(url==='/api/login'&&method==='POST'){
+    const u=S.users.find(x=>x.email===String(body.email||'').trim().toLowerCase()&&x.pass===body.password);
+    if(!u)throw sErr('bad_login');S.session=u.id;return done({ok:true})}
+  if(url==='/api/logout'){S.session=null;return done({ok:true})}
+  if(url==='/api/me')return{user:cur?{id:cur.id,name:cur.name,email:cur.email,role:cur.role,balance:cur.role==='investor'?sBal(cur.id)/100:undefined}:null};
+  if(url==='/api/projects'&&method==='GET')return S.projects.slice().reverse().map(sProj);
+  if(url==='/api/projects'&&method==='POST')return done({id:sAddProject(need('owner').id,body).id});
+  if(m=url.match(/^\/api\/projects\/(\d+)$/)){const p=S.projects.find(x=>x.id===+m[1]);if(!p)throw sErr('not_found');return sProj(p)}
+  if(m=url.match(/^\/api\/projects\/(\d+)\/buy$/))return done({balance:sBuy(need('investor'),+m[1],body.shares)});
+  if(m=url.match(/^\/api\/projects\/(\d+)\/payout$/))return done({investors:sPayout(need('owner'),+m[1],sCts(body.amount,.01,1e7),String(body.note||'').slice(0,120))});
+  if(url==='/api/wallet/deposit'){const u=need('investor');sTxAdd(u.id,'deposit',sCts(body.amount,.01,1e5));return done({balance:sBal(u.id)/100})}
+  if(url==='/api/wallet/withdraw'){const u=need('investor'),c=sCts(body.amount,.01,1e7),d=String(body.destination||'').trim();
+    if(d.length<4||d.length>100)throw sErr('bad_input');if(sBal(u.id)<c)throw sErr('no_funds');sTxAdd(u.id,'withdraw',-c,null,d);return done({balance:sBal(u.id)/100})}
+  if(url==='/api/investor/dashboard'){const u=need('investor'),mine=S.inv.filter(x=>x.uid===u.id),ids=[...new Set(mine.map(x=>x.pid))];
+    const inc=pid=>S.tx.filter(x=>x.uid===u.id&&x.type==='income'&&x.pid===pid).reduce((a,x)=>a+x.amount,0);
+    const holdings=ids.map(pid=>{const p=S.projects.find(x=>x.id===pid),sh=mine.filter(x=>x.pid===pid).reduce((a,x)=>a+x.shares,0);
+      return{id:pid,title:p.title,shares:sh,totalShares:p.total,invested:sh*p.price/100,income:inc(pid)/100}});
+    return{balance:sBal(u.id)/100,holdings,totalIncome:S.tx.filter(x=>x.uid===u.id&&x.type==='income').reduce((a,x)=>a+x.amount,0)/100,
+      history:S.tx.filter(x=>x.uid===u.id).slice().reverse().map(x=>({id:x.id,type:x.type,amount:x.amount/100,note:x.note,project:(S.projects.find(p=>p.id===x.pid)||{}).title||null,date:x.created}))}}
+  if(url==='/api/owner/dashboard'){const u=need('owner');
+    return S.projects.filter(p=>p.oid===u.id).reverse().map(p=>{const by={};S.inv.filter(x=>x.pid===p.id).forEach(x=>by[x.uid]=(by[x.uid]||0)+x.shares);
+      return{...sProj(p),investors:Object.entries(by).map(([id,sh])=>({name:S.users.find(x=>x.id===+id).name,shares:sh,amount:sh*p.price/100})).sort((a,b)=>b.shares-a.shares),
+        payouts:S.payouts.filter(x=>x.pid===p.id).reverse().map(x=>({amount:x.amount/100,note:x.note,date:x.created}))}})}
+  throw sErr('not_found');
+}
+
+/* ---------- API ---------- */
+async function api(method,url,body){
+  if(STATIC)return staticApi(method,url,body);
+  let r;
+  try{r=await fetch(url,{method,credentials:'same-origin',headers:body?{'Content-Type':'application/json'}:{},body:body?JSON.stringify(body):undefined})}
+  catch(e){const x=new Error('server');x.code='server';throw x}
+  let d={};try{d=await r.json()}catch(e){}
+  if(!r.ok){const x=new Error(d.error||'server');x.code=d.error||'server';throw x}
+  return d;
+}
+const errText=e=>{const k='e_'+(e.code||'server');return T[k]?t(k):t('e_server')};
 
 /* ---------- helpers ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const loc=()=>lang==='ar'?'ar-EG':'en-US';
 const num=n=>Number(n||0).toLocaleString(loc(),{maximumFractionDigits:2});
-const money=n=>(lang==='ar'?'':'$')+num(n)+(lang==='ar'?' $':'');
-const fdate=t=>new Date(t).toLocaleDateString(loc());
-const me=()=>db.users.find(u=>u.id===db.session);
-const proj=id=>db.projects.find(p=>p.id===id);
-const totalShares=p=>Math.round(p.goal/p.sharePrice);
-const sold=p=>db.investments.filter(x=>x.projectId===p.id).reduce((a,x)=>a+x.shares,0);
-const raised=p=>sold(p)*p.sharePrice;
-const pct=p=>Math.min(100,Math.round(sold(p)/totalShares(p)*100));
-const sharesOf=(p,uid)=>db.investments.filter(x=>x.projectId===p.id&&x.userId===uid).reduce((a,x)=>a+x.shares,0);
-const incomeOf=(p,uid)=>db.payouts.filter(x=>x.projectId===p.id).reduce((a,x)=>a+(x.splits[uid]||0),0);
-const catName=p=>t('c_'+p.cat);
-let flash='';
+const money=n=>lang==='ar'?num(n)+' $':'$'+num(n);
+const fdate=ts=>new Date(ts).toLocaleDateString(loc());
+const totalOf=p=>p.totalShares, pct=p=>Math.min(100,Math.round(p.sold/p.totalShares*100));
+const catName=c=>T['c_'+c]?t('c_'+c):esc(c);
+let me=null,flash='';
+async function loadMe(){try{me=(await api('GET','/api/me')).user}catch(e){me=null}}
 function msg(s,err){flash=`<div class="msg ${err?'err':''}">${esc(s)}</div>`}
-function go(h){location.hash=h}
+function go(h){if(location.hash===h)render();else location.hash=h}
 
 /* ---------- nav ---------- */
 function nav(){
-  const u=me();
   $('#nav').innerHTML=`<a class="logo" href="#/">${lang==='ar'?'تمويل <span>شيرز</span>':'Tamweel <span>Shares</span>'}</a>
-   <a href="#/">${t('projects')}</a>`+(u?
-   `<a href="#/dashboard">${t('dash')}</a><span class="mut">${esc(L(u.name))} · ${t(u.role==='owner'?'owner':'investor')}</span><button class="btn ghost sm" onclick="logout()">${t('logout')}</button>`:
+   <a href="#/">${t('projects')}</a>`+(me?
+   `<a href="#/dashboard">${t('dash')}</a><span class="mut">${esc(me.name)} · ${t(me.role)}</span><button class="btn ghost sm" onclick="logout()">${t('logout')}</button>`:
    `<a href="#/login">${t('login')}</a><a class="btn sm" href="#/signup">${t('signup')}</a>`)+
    `<button class="btn ghost sm" onclick="setLang('${lang==='ar'?'en':'ar'}')">${t('langBtn')}</button>`;
 }
-function logout(){db.session=null;save();go('#/')}
+async function logout(){try{await api('POST','/api/logout',{})}catch(e){}me=null;go('#/')}
 
 /* ---------- views ---------- */
 function projectCard(p){
-  const d=L(p.desc);
-  return `<div class="card"><span class="tag">${esc(catName(p))}</span><h3>${esc(L(p.title))}</h3>
+  const d=p.description;
+  return `<div class="card"><span class="tag">${catName(p.category)}</span><h3>${esc(p.title)}</h3>
   <div class="mut">${esc(d.slice(0,90))}${d.length>90?'…':''}</div>
   <div class="prog"><i style="width:${pct(p)}%"></i></div>
-  <div class="row"><b>${money(raised(p))}</b><span class="mut">${t('of')} ${money(p.goal)} · ${num(pct(p))}%</span></div>
-  <div class="row mut" style="margin:6px 0 12px"><span>${money(p.sharePrice)} ${t('perShare')}</span><span>${num(totalShares(p)-sold(p))} ${t('left')}</span></div>
+  <div class="row"><b>${money(p.raised)}</b><span class="mut">${t('of')} ${money(p.goal)} · ${num(pct(p))}%</span></div>
+  <div class="row mut" style="margin:6px 0 12px"><span>${money(p.sharePrice)} ${t('perShare')}</span><span>${num(p.totalShares-p.sold)} ${t('left')}</span></div>
   <a class="btn sm" href="#/project/${p.id}">${t('viewInvest')}</a></div>`;
 }
-function vHome(){
-  const u=me();
+async function vHome(){
+  const list=await api('GET','/api/projects');
   return `<div class="hero"><h1>${t('heroH')}</h1><p>${t('heroP')}</p>
-  ${u?'':`<a class="btn" href="#/signup">${t('start')}</a>`}</div>
+  ${me?'':`<a class="btn" href="#/signup">${t('start')}</a>`}</div>
   <div class="steps"><div class="step"><b>${t('s1')}</b>${t('s1d')}</div>
   <div class="step"><b>${t('s2')}</b>${t('s2d')}</div>
   <div class="step"><b>${t('s3')}</b>${t('s3d')}</div></div>
-  <h2>${t('open')}</h2><div class="grid">${db.projects.slice().reverse().map(projectCard).join('')||`<p class="mut">${t('none')}</p>`}</div>`;
+  <h2>${t('open')}</h2><div class="grid">${list.map(projectCard).join('')||`<p class="mut">${t('none')}</p>`}</div>`;
 }
-function vProject(id){
-  const p=proj(id);if(!p)return `<p>${t('notFound')}</p>`;
-  const u=me(),owner=db.users.find(x=>x.id===p.ownerId),left=totalShares(p)-sold(p);
-  let box;
-  if(!u)box=`<p>${t('needLogin')}</p><a class="btn" href="#/login">${t('login')}</a> <a class="btn ghost" href="#/signup">${t('signup')}</a>`;
-  else if(u.role==='owner')box=`<p class="mut">${t('ownerNote')}</p>`+(u.id===p.ownerId?`<a class="btn" href="#/dashboard">${t('openDash')}</a>`:'');
-  else if(!left)box=`<p><b>${t('funded')}</b></p>`+(sharesOf(p,u.id)?`<p class="mut">${t('youHold')} ${num(sharesOf(p,u.id))} ${t('sharesW')}.</p>`:'');
+async function vProject(id){
+  let p;try{p=await api('GET','/api/projects/'+id)}catch(e){return `<p>${t('notFound')}</p>`}
+  const left=p.totalShares-p.sold;let box;
+  if(!me)box=`<p>${t('needLogin')}</p><a class="btn" href="#/login">${t('login')}</a> <a class="btn ghost" href="#/signup">${t('signup')}</a>`;
+  else if(me.role==='owner')box=`<p class="mut">${t('ownerNote')}</p><a class="btn" href="#/dashboard">${t('openDash')}</a>`;
+  else if(!left)box=`<p><b>${t('funded')}</b></p>`;
   else box=`<h3 style="margin-top:0">${t('buyH')}</h3>
-   <form class="f" onsubmit="return buy(event,'${p.id}')">
-   <label>${t('qty')} ${left})<input type="number" id="qty" min="1" max="${left}" value="1" required oninput="$('#cost').textContent=money(this.value*${p.sharePrice})"></label>
+   <p class="mut">${t('walletBal')}: <b>${money(me.balance)}</b> · <a href="#/dashboard">${t('wallet')}</a></p>
+   <form class="f" onsubmit="return buy(event,${p.id})">
+   <label>${t('qty')} ${num(left)})<input type="number" id="qty" min="1" max="${left}" step="1" value="1" required oninput="$('#cost').textContent=money(this.value*${p.sharePrice})"></label>
    <div class="row"><span>${t('total')}</span><b id="cost">${money(p.sharePrice)}</b></div>
-   <button class="btn">${t('confirm')}</button></form>
-   ${sharesOf(p,u.id)?`<p class="mut">${t('youHold')} ${num(sharesOf(p,u.id))} ${t('sharesW')}.</p>`:''}
-   <p class="mut" style="font-size:.8rem">${t('demo')}</p>`;
-  return `<p><a href="#/">${t('back')}</a></p>${flash}<div class="two"><div class="card"><span class="tag">${esc(catName(p))}</span>
-  <h1 style="margin:8px 0">${esc(L(p.title))}</h1><p class="mut">${t('by')} ${esc(L(owner?.name)||'')} · ${t('listed')} ${fdate(p.date)}</p><p>${esc(L(p.desc))}</p>
+   <button class="btn">${t('confirm')}</button></form>`;
+  return `<p><a href="#/">${t('back')}</a></p>${flash}<div class="two"><div class="card"><span class="tag">${catName(p.category)}</span>
+  <h1 style="margin:8px 0">${esc(p.title)}</h1><p class="mut">${t('by')} ${esc(p.owner)} · ${t('listed')} ${fdate(p.created)}</p><p>${esc(p.description)}</p>
   <div class="prog"><i style="width:${pct(p)}%"></i></div>
-  <div class="stats"><div class="stat"><small>${t('raised')}</small><b>${money(raised(p))}</b></div><div class="stat"><small>${t('goal')}</small><b>${money(p.goal)}</b></div>
-  <div class="stat"><small>${t('sharePrice')}</small><b>${money(p.sharePrice)}</b></div><div class="stat"><small>${t('sharesLeft')}</small><b>${num(left)}/${num(totalShares(p))}</b></div></div></div>
+  <div class="stats"><div class="stat"><small>${t('raised')}</small><b>${money(p.raised)}</b></div><div class="stat"><small>${t('goal')}</small><b>${money(p.goal)}</b></div>
+  <div class="stat"><small>${t('sharePrice')}</small><b>${money(p.sharePrice)}</b></div><div class="stat"><small>${t('sharesLeft')}</small><b>${num(left)}/${num(p.totalShares)}</b></div></div></div>
   <div class="card">${box}</div></div>`;
 }
-function buy(e,id){
-  e.preventDefault();const p=proj(id),u=me(),q=parseInt($('#qty').value);
-  if(!(q>=1)||q>totalShares(p)-sold(p)){msg(t('badQty'),1);render();return false}
-  db.investments.push({id:uid(),projectId:id,userId:u.id,shares:q,date:Date.now()});save();
-  msg(t('bought',num(q),money(q*p.sharePrice)));render();return false;
+async function buy(e,id){
+  e.preventDefault();const q=parseInt($('#qty').value);
+  try{await api('POST',`/api/projects/${id}/buy`,{shares:q});await loadMe();msg(t('bought',num(q)))}catch(x){msg(errText(x),1)}
+  render();return false;
 }
 function vAuth(mode){
   const su=mode==='signup';
   return `<div class="card" style="max-width:460px;margin:20px auto"><h2 style="margin-top:0">${su?t('createAcc'):t('login')}</h2>${flash}
   <form class="f" onsubmit="return ${su?'doSignup':'doLogin'}(event)" style="max-width:none">
   ${su?`<div class="seg"><label><input type="radio" name="role" value="investor" checked>${t('wantInvest')}</label><label><input type="radio" name="role" value="owner">${t('ownProject')}</label></div>
-  <label>${t('fullName')}<input id="name" required></label>`:''}
-  <label>${t('email')}<input id="email" type="email" required dir="ltr" style="text-align:start"></label>
-  <label>${t('pass')}<input id="pass" type="password" required minlength="6" dir="ltr" style="text-align:start"></label>
+  <label>${t('fullName')}<input id="name" required maxlength="80" autocomplete="name"></label>`:''}
+  <label>${t('email')}<input id="email" type="email" required class="ltr" autocomplete="email"></label>
+  <label>${t('pass')}<input id="pass" type="password" required minlength="${su?8:1}" class="ltr" autocomplete="${su?'new-password':'current-password'}"></label>
   <button class="btn">${su?t('signup'):t('login')}</button></form>
-  <p class="mut">${su?`${t('haveAcc')} <a href="#/login">${t('login')}</a>`:`${t('newHere')} <a href="#/signup">${t('signup')}</a>`}</p>
-  ${su?'':`<p class="mut" style="font-size:.8rem">${t('demoHint')}</p>`}</div>`;
+  <p class="mut">${su?`${t('haveAcc')} <a href="#/login">${t('login')}</a>`:`${t('newHere')} <a href="#/signup">${t('signup')}</a>`}</p></div>`;
 }
-function doSignup(e){
-  e.preventDefault();const email=$('#email').value.trim().toLowerCase();
-  if(db.users.some(u=>u.email===email)){msg(t('emailUsed'),1);render();return false}
-  const u={id:uid(),name:$('#name').value.trim(),email,pass:$('#pass').value,role:document.querySelector('[name=role]:checked').value};
-  db.users.push(u);db.session=u.id;save();flash='';go('#/dashboard');return false;
+async function doSignup(e){
+  e.preventDefault();
+  try{await api('POST','/api/signup',{name:$('#name').value,email:$('#email').value,password:$('#pass').value,role:document.querySelector('[name=role]:checked').value});
+   await loadMe();flash='';go('#/dashboard')}catch(x){msg(errText(x),1);render()}
+  return false;
 }
-function doLogin(e){
-  e.preventDefault();const email=$('#email').value.trim().toLowerCase();
-  const u=db.users.find(x=>x.email===email&&x.pass===$('#pass').value);
-  if(!u){msg(t('wrong'),1);render();return false}
-  db.session=u.id;save();flash='';go('#/dashboard');return false;
+async function doLogin(e){
+  e.preventDefault();
+  try{await api('POST','/api/login',{email:$('#email').value,password:$('#pass').value});await loadMe();flash='';go('#/dashboard')}
+  catch(x){msg(errText(x),1);render()}
+  return false;
 }
 
-/* investor dashboard */
-function vInvestor(u){
-  const held=db.projects.filter(p=>sharesOf(p,u.id)>0);
-  const invested=held.reduce((a,p)=>a+sharesOf(p,u.id)*p.sharePrice,0);
-  const income=held.reduce((a,p)=>a+incomeOf(p,u.id),0);
-  const pays=[];db.payouts.forEach(x=>{if(x.splits[u.id])pays.push({...x,mine:x.splits[u.id]})});pays.sort((a,b)=>b.date-a.date);
-  return `<h1>${t('hello')} ${esc(L(u.name))}</h1>${flash}
+/* investor dashboard + wallet */
+async function vInvestor(){
+  const d=await api('GET','/api/investor/dashboard');
+  const invested=d.holdings.reduce((a,h)=>a+h.invested,0);
+  const incomes=d.history.filter(h=>h.type==='income');
+  return `<h1>${t('hello')} ${esc(me.name)}</h1>${flash}
+  <div class="two eq">
+   <div class="card wallet"><div class="mut">${t('available')}</div><div class="big">${money(d.balance)}</div>
+    <p class="mut" style="font-size:.8rem;margin-bottom:0">${t('demoWallet')}</p></div>
+   <div class="card"><b>${t('withdrawH')}</b>
+    <form class="f" style="margin-top:8px;max-width:none" onsubmit="return doWithdraw(event)">
+     <label>${t('wdAmount')}<input name="amt" type="number" min="0.01" step="0.01" max="${d.balance}" required>
+      <a href="#" onclick="document.querySelector('[name=amt]').value=${d.balance};return false" class="mut">${t('wdAll')}</a></label>
+     <label>${t('wdDest')}<input name="dest" required minlength="4" maxlength="100" class="ltr" placeholder="SA00 0000 0000 0000 0000 0000"></label>
+     <button class="btn" ${d.balance>0?'':'disabled'}>${t('wdBtn')}</button></form></div></div>
+  <details style="margin:10px 0"><summary class="mut" style="cursor:pointer">${t('addFunds')}</summary>
+   <form class="f" style="margin-top:8px;display:flex;gap:8px;max-width:360px" onsubmit="return doDeposit(event)">
+    <input name="amt" type="number" min="1" max="100000" step="0.01" required placeholder="1000"><button class="btn">${t('addBtn')}</button></form></details>
   <div class="stats"><div class="stat"><small>${t('invested')}</small><b>${money(invested)}</b></div>
-  <div class="stat"><small>${t('income')}</small><b class="pos">${money(income)}</b></div>
-  <div class="stat"><small>${t('projCount')}</small><b>${num(held.length)}</b></div>
-  <div class="stat"><small>${t('ret')}</small><b>${num(invested?(income/invested*100).toFixed(1):0)}%</b></div></div>
-  <h2>${t('myShares')}</h2>${held.length?`<div class="card tw"><table><tr><th>${t('project')}</th><th>${t('shares')}</th><th>${t('ownership')}</th><th>${t('investedCol')}</th><th>${t('incomeCol')}</th></tr>
-  ${held.map(p=>{const s=sharesOf(p,u.id);return `<tr><td><a href="#/project/${p.id}">${esc(L(p.title))}</a></td><td>${num(s)}</td><td>${num((s/totalShares(p)*100).toFixed(2))}%</td><td>${money(s*p.sharePrice)}</td><td class="pos">${money(incomeOf(p,u.id))}</td></tr>`}).join('')}</table></div>`:
+  <div class="stat"><small>${t('income')}</small><b class="pos">${money(d.totalIncome)}</b></div>
+  <div class="stat"><small>${t('projCount')}</small><b>${num(d.holdings.length)}</b></div>
+  <div class="stat"><small>${t('ret')}</small><b>${num(invested?(d.totalIncome/invested*100).toFixed(1):0)}%</b></div></div>
+  <h2>${t('myShares')}</h2>${d.holdings.length?`<div class="card tw"><table><tr><th>${t('project')}</th><th>${t('shares')}</th><th>${t('ownership')}</th><th>${t('investedCol')}</th><th>${t('incomeCol')}</th></tr>
+  ${d.holdings.map(h=>`<tr><td><a href="#/project/${h.id}">${esc(h.title)}</a></td><td>${num(h.shares)}</td><td>${num((h.shares/h.totalShares*100).toFixed(2))}%</td><td>${money(h.invested)}</td><td class="pos">${money(h.income)}</td></tr>`).join('')}</table></div>`:
   `<div class="card">${t('noShares')} <a href="#/">${t('browse')}</a></div>`}
-  <h2>${t('hist')}</h2>${pays.length?`<div class="card tw"><table><tr><th>${t('date')}</th><th>${t('project')}</th><th>${t('note')}</th><th>${t('received')}</th></tr>
-  ${pays.map(x=>`<tr><td>${fdate(x.date)}</td><td>${esc(L(proj(x.projectId)?.title))}</td><td>${esc(L(x.note))}</td><td class="pos">+${money(x.mine)}</td></tr>`).join('')}</table></div>`:`<div class="card mut">${t('noIncome')}</div>`}`;
+  <h2>${t('txH')}</h2>${d.history.length?`<div class="card tw"><table><tr><th>${t('date')}</th><th>${t('type')}</th><th>${t('project')} / ${t('note')}</th><th>${t('amount')}</th></tr>
+  ${d.history.map(h=>`<tr><td>${fdate(h.date)}</td><td>${t('tx_'+h.type)}</td><td>${esc(h.project||'')}${h.note?' · '+esc(h.note):''}</td><td class="${h.amount>=0?'pos':'neg'}" dir="ltr">${h.amount>=0?'+':'−'}${money(Math.abs(h.amount))}</td></tr>`).join('')}</table></div>`:`<div class="card mut">${t('noTx')}</div>`}`;
+}
+async function doWithdraw(e){
+  e.preventDefault();const f=e.target;
+  try{const r=await api('POST','/api/wallet/withdraw',{amount:parseFloat(f.amt.value),destination:f.dest.value});await loadMe();msg(t('wdDone',money(r.balance)))}
+  catch(x){msg(errText(x),1)}
+  render();return false;
+}
+async function doDeposit(e){
+  e.preventDefault();
+  try{const r=await api('POST','/api/wallet/deposit',{amount:parseFloat(e.target.amt.value)});await loadMe();msg(t('depDone',money(r.balance)))}
+  catch(x){msg(errText(x),1)}
+  render();return false;
 }
 
 /* owner dashboard */
-function vOwner(u){
-  const mine=db.projects.filter(p=>p.ownerId===u.id);
-  const tot=mine.reduce((a,p)=>a+raised(p),0);
-  const inv=new Set(db.investments.filter(x=>mine.some(p=>p.id===x.projectId)).map(x=>x.userId)).size;
-  const paid=db.payouts.filter(x=>mine.some(p=>p.id===x.projectId)).reduce((a,x)=>a+x.amount,0);
+async function vOwner(){
+  const mine=await api('GET','/api/owner/dashboard');
+  const tot=mine.reduce((a,p)=>a+p.raised,0),paid=mine.reduce((a,p)=>a+p.payouts.reduce((x,y)=>x+y.amount,0),0);
+  const inv=mine.reduce((a,p)=>a+p.investors.length,0);
   return `<h1>${t('ownerDash')}</h1>${flash}
   <div class="stats"><div class="stat"><small>${t('totalRaised')}</small><b>${money(tot)}</b></div><div class="stat"><small>${t('investors')}</small><b>${num(inv)}</b></div>
   <div class="stat"><small>${t('paidOut')}</small><b>${money(paid)}</b></div><div class="stat"><small>${t('myProjects')}</small><b>${num(mine.length)}</b></div></div>
@@ -299,63 +392,68 @@ function vOwner(u){
   ${mine.map(ownerProject).join('')||`<div class="card mut">${t('noOwn')}</div>`}`;
 }
 function ownerProject(p){
-  const rows=db.users.filter(x=>sharesOf(p,x.id)>0).map(x=>({u:x,s:sharesOf(p,x.id)})).sort((a,b)=>b.s-a.s);
-  const pays=db.payouts.filter(x=>x.projectId===p.id).sort((a,b)=>b.date-a.date);
-  return `<div class="card" style="margin-bottom:16px"><div class="row"><h3 style="margin:0">${esc(L(p.title))}</h3><a href="#/project/${p.id}">${t('publicPage')}</a></div>
+  return `<div class="card" style="margin-bottom:16px"><div class="row"><h3 style="margin:0">${esc(p.title)}</h3><a href="#/project/${p.id}">${t('publicPage')}</a></div>
   <div class="prog"><i style="width:${pct(p)}%"></i></div>
-  <div class="row"><b>${money(raised(p))} ${t('raisedLow')}</b><span class="mut">${t('goal')} ${money(p.goal)} · ${num(sold(p))}/${num(totalShares(p))} ${t('sold')}</span></div>
-  <div class="two" style="margin-top:14px"><div><b>${t('investors')}</b>${rows.length?`<div class="tw"><table><tr><th>${t('name')}</th><th>${t('shares')}</th><th>${t('amount')}</th><th>${t('pctCol')}</th></tr>
-  ${rows.map(r=>`<tr><td>${esc(L(r.u.name))}</td><td>${num(r.s)}</td><td>${money(r.s*p.sharePrice)}</td><td>${num((r.s/sold(p)*100).toFixed(1))}%</td></tr>`).join('')}</table></div>`:`<p class="mut">${t('noInv')}</p>`}
-  ${pays.length?`<p style="margin-bottom:4px"><b>${t('payHist')}</b></p>${pays.map(x=>`<div class="row mut"><span>${fdate(x.date)} · ${esc(L(x.note))}</span><span>${money(x.amount)}</span></div>`).join('')}`:''}</div>
-  <div><b>${t('shareInc')}</b><form class="f" style="margin-top:8px" onsubmit="return payout(event,'${p.id}')">
-  <label>${t('amtDist')}<input type="number" min="1" step="0.01" name="amt" required></label>
-  <label>${t('note')}<input name="note" placeholder="${t('notePh')}"></label>
-  <button class="btn" ${sold(p)?'':'disabled'}>${t('distBtn')}</button></form>
+  <div class="row"><b>${money(p.raised)} ${t('raisedLow')}</b><span class="mut">${t('goal')} ${money(p.goal)} · ${num(p.sold)}/${num(p.totalShares)} ${t('sold')}</span></div>
+  <div class="two" style="margin-top:14px"><div><b>${t('investors')}</b>${p.investors.length?`<div class="tw"><table><tr><th>${t('name')}</th><th>${t('shares')}</th><th>${t('amount')}</th><th>${t('pctCol')}</th></tr>
+  ${p.investors.map(r=>`<tr><td>${esc(r.name)}</td><td>${num(r.shares)}</td><td>${money(r.amount)}</td><td>${num((r.shares/p.sold*100).toFixed(1))}%</td></tr>`).join('')}</table></div>`:`<p class="mut">${t('noInv')}</p>`}
+  ${p.payouts.length?`<p style="margin-bottom:4px"><b>${t('payHist')}</b></p>${p.payouts.map(x=>`<div class="row mut"><span>${fdate(x.date)}${x.note?' · '+esc(x.note):''}</span><span>${money(x.amount)}</span></div>`).join('')}`:''}</div>
+  <div><b>${t('shareInc')}</b><form class="f" style="margin-top:8px" onsubmit="return payout(event,${p.id})">
+  <label>${t('amtDist')}<input type="number" min="0.01" step="0.01" name="amt" required></label>
+  <label>${t('note')}<input name="note" maxlength="120" placeholder="${t('notePh')}"></label>
+  <button class="btn" ${p.sold?'':'disabled'}>${t('distBtn')}</button></form>
   <p class="mut" style="font-size:.8rem">${t('distNote')}</p></div></div></div>`;
 }
-function payout(e,id){
-  e.preventDefault();const p=proj(id),f=e.target,amt=parseFloat(f.amt.value),s=sold(p);
-  if(!s||!(amt>0)){return false}
-  const splits={};db.investments.filter(x=>x.projectId===id).forEach(x=>{splits[x.userId]=(splits[x.userId]||0)+amt*x.shares/s});
-  Object.keys(splits).forEach(k=>splits[k]=Math.round(splits[k]*100)/100);
-  db.payouts.push({id:uid(),projectId:id,amount:amt,note:f.note.value.trim()||{ar:'دخل',en:'Income'},date:Date.now(),splits});save();
-  msg(t('distDone',money(amt),num(Object.keys(splits).length)));render();return false;
+async function payout(e,id){
+  e.preventDefault();const f=e.target,amt=parseFloat(f.amt.value);
+  try{const r=await api('POST',`/api/projects/${id}/payout`,{amount:amt,note:f.note.value});msg(t('distDone',money(amt),num(r.investors)))}
+  catch(x){msg(errText(x),1)}
+  render();return false;
 }
 function vNew(){
-  return `<p><a href="#/dashboard">${t('backB')}</a></p><div class="card" style="max-width:560px"><h2 style="margin-top:0">${t('newH')}</h2>
+  return `<p><a href="#/dashboard">${t('backB')}</a></p>${flash}<div class="card" style="max-width:560px"><h2 style="margin-top:0">${t('newH')}</h2>
   <form class="f" style="max-width:none" onsubmit="return createProject(event)">
-  <label>${t('pname')}<input name="title" required></label>
+  <label>${t('pname')}<input name="title" required minlength="3" maxlength="120"></label>
   <label>${t('cat')}<select name="cat">${CATS.map(c=>`<option value="${c}">${t('c_'+c)}</option>`).join('')}</select></label>
-  <label>${t('desc')}<textarea name="desc" rows="4" required placeholder="${t('descPh')}"></textarea></label>
-  <label>${t('goalIn')}<input type="number" name="goal" min="100" required></label>
-  <label>${t('priceIn')}<input type="number" name="price" min="1" required></label>
+  <label>${t('desc')}<textarea name="desc" rows="4" required minlength="10" maxlength="3000" placeholder="${t('descPh')}"></textarea></label>
+  <label>${t('goalIn')}<input type="number" name="goal" min="100" step="1" required></label>
+  <label>${t('priceIn')}<input type="number" name="price" min="1" step="1" required></label>
   <p class="mut" id="calc"></p><button class="btn">${t('publish')}</button></form></div>`;
 }
-function createProject(e){
-  e.preventDefault();const f=e.target,goal=+f.goal.value,price=+f.price.value;
-  if(price>goal){alert(t('priceErr'));return false}
-  const p={id:uid(),ownerId:me().id,title:f.title.value.trim(),cat:f.cat.value,desc:f.desc.value.trim(),goal:Math.round(goal/price)*price,sharePrice:price,date:Date.now()};
-  db.projects.push(p);save();msg(t('published'));go('#/dashboard');return false;
+async function createProject(e){
+  e.preventDefault();const f=e.target;
+  try{await api('POST','/api/projects',{title:f.title.value,category:f.cat.value,description:f.desc.value,goal:+f.goal.value,sharePrice:+f.price.value});
+   msg(t('published'));go('#/dashboard')}catch(x){msg(errText(x),1);render()}
+  return false;
 }
 document.addEventListener('input',e=>{
   const f=e.target.form;if(f&&f.goal&&f.price&&$('#calc')){const g=+f.goal.value,p=+f.price.value;
-   $('#calc').textContent=g&&p?t('calc',num(Math.round(g/p))):''}
+   $('#calc').textContent=g&&p?t('calc',num(Math.floor(g/p))):''}
 });
 
 /* ---------- router ---------- */
-function render(){
-  nav();const h=location.hash||'#/',u=me();let html;
-  if(h.startsWith('#/project/'))html=vProject(h.split('/')[2]);
-  else if(h==='#/login')html=vAuth('login');
-  else if(h==='#/signup')html=vAuth('signup');
-  else if(h==='#/dashboard')html=!u?(go('#/login'),''):u.role==='owner'?vOwner(u):vInvestor(u);
-  else if(h==='#/new')html=u&&u.role==='owner'?vNew():(go('#/login'),'');
-  else html=vHome();
+let renderTok=0;
+async function render(){
+  const tok=++renderTok;nav();const h=location.hash||'#/';let html;
+  try{
+    if(h.startsWith('#/project/'))html=await vProject(parseInt(h.split('/')[2])||0);
+    else if(h==='#/login')html=me?(go('#/dashboard'),''):vAuth('login');
+    else if(h==='#/signup')html=me?(go('#/dashboard'),''):vAuth('signup');
+    else if(h==='#/dashboard')html=!me?(go('#/login'),''):me.role==='owner'?await vOwner():await vInvestor();
+    else if(h==='#/new')html=me&&me.role==='owner'?vNew():(go('#/login'),'');
+    else html=await vHome();
+  }catch(e){html=`<div class="msg err">${esc(errText(e))}</div>`}
+  if(tok!==renderTok)return;
   $('#app').innerHTML=html;flash='';
   if(!h.startsWith('#/new'))window.scrollTo(0,0);
 }
 window.addEventListener('hashchange',render);
-applyLang();render();
+async function boot(){
+  try{const r=await fetch('/api/me',{credentials:'same-origin'});STATIC=!(r.ok&&/json/.test(r.headers.get('content-type')||''))}catch(e){STATIC=true}
+  if(STATIC)document.querySelector('header').insertAdjacentHTML('afterend',`<div class="msg" style="margin:0;border-radius:0;text-align:center;font-size:.85rem;background:#fffbeb;color:#92400e">${t('staticNote')}</div>`);
+  await loadMe();render();
+}
+applyLang();boot();
 </script>
 </body>
 </html>

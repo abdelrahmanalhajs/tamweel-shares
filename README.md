@@ -3,6 +3,8 @@
 Crowdfunding with shares. Arabic (default, RTL) + English.
 Node 22.5+ and SQLite (built in) — **no npm dependencies**.
 
+On a static host (e.g. GitHub Pages) there is no server, so the same page runs in a **browser-only demo mode** (data in localStorage, banner shown). With the Node server it uses the real database.
+
 ## Run locally
 ```bash
 npm run dev      # seeds demo accounts (owner@demo.com / investor@demo.com, password demo12345)

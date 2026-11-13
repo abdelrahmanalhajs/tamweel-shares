@@ -291,7 +291,7 @@ route('POST', /^\/api\/wallet\/withdraw$/, (req, res, ctx) => {
   return { balance: dollars(withdraw(u, cents(ctx.body.amount), str(ctx.body.destination, 4, 100))) };
 });
 
-const INDEX = path.join(__dirname, 'public', 'index.html');
+const INDEX = path.join(__dirname, 'index.html');
 function securityHeaders(res) {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
