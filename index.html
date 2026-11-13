@@ -77,6 +77,7 @@ dl.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:10px 0}dl.
 <header><div class="bar" id="nav"></div></header>
 <main id="app"></main>
 
+<script src="analysis.js"></script>
 <script>
 /* ---------- language (default Arabic) ---------- */
 let lang='ar';
@@ -211,6 +212,105 @@ const T={
  e_kyc_locked:{ar:'طلب التحقق قيد المراجعة أو معتمد بالفعل.',en:'Verification is already pending or approved.'},e_file_too_large:{ar:'الملف أكبر من ٢ ميجابايت.',en:'File is larger than 2 MB.'},
  e_bad_file_type:{ar:'نوع الملف غير مدعوم (PDF أو PNG أو JPG فقط).',en:'Unsupported file type (PDF, PNG or JPG only).'},e_too_many_files:{ar:'تم الوصول للحد الأقصى من الملفات.',en:'File limit reached.'},
  e_below_minimum:{ar:'أقل من الحد الأدنى للاستثمار.',en:'Below the minimum investment.'},e_risk_required:{ar:'حدد مستوى المخاطرة قبل الاعتماد.',en:'Set a risk level before approving.'},
+ /* phase 2-5 */
+ navAcademy:{ar:'الأكاديمية',en:'Academy'},navMarket:{ar:'السوق الثانوي',en:'Resale market'},navSim:{ar:'محاكي التوسع',en:'Expansion simulator'},navAccount:{ar:'حسابي',en:'Account'},navCompare:{ar:'مقارنة',en:'Compare'},
+ compareAdd:{ar:'+ قارن',en:'+ Compare'},compareDel:{ar:'✓ في المقارنة',en:'✓ Comparing'},follow:{ar:'☆ تابع المشروع',en:'☆ Follow'},unfollow:{ar:'★ تتابع المشروع',en:'★ Following'},
+ anaH:{ar:'التحليل المالي',en:'Financial analysis'},noFin:{ar:'لم يرفع صاحب المشروع بيانات مالية شهرية بعد.',en:'The owner has not uploaded monthly financials yet.'},
+ rating:{ar:'تقييم المشروع',en:'Project rating'},score:{ar:'الدرجة',en:'Score'},sugRisk:{ar:'المخاطرة المقترحة',en:'Suggested risk'},
+ rc_stability:{ar:'الاستقرار',en:'Stability'},rc_profitability:{ar:'الربحية',en:'Profitability'},rc_growth:{ar:'نمو المبيعات',en:'Sales growth'},rc_cashflow:{ar:'التدفقات النقدية',en:'Cash flow'},
+ rc_debt:{ar:'المديونية',en:'Debt'},rc_verification:{ar:'التحقق من البيانات',en:'Data verification'},rc_history:{ar:'تاريخ النشاط',en:'Track record'},
+ rv_stability:{ar:'%1 شهرًا من البيانات، تذبذب المبيعات %2%',en:'%1 months of data, sales volatility %2%'},rv_profitability:{ar:'هامش صافي الربح %1%',en:'Net margin %1%'},
+ rv_growth:{ar:'اتجاه المبيعات %1% شهريًا',en:'Sales trend %1% per month'},rv_cashflow:{ar:'متوسط التدفق النقدي الشهري %1',en:'Average monthly cash flow %1'},
+ rv_debt:{ar:'الديون %1% من المبيعات السنوية',en:'Debt = %1% of annual sales'},rv_verification:{ar:'%1% من الشهور موثّقة، %2 أنواع مستندات',en:'%1% of months verified, %2 document types'},
+ rv_history:{ar:'عمر النشاط %1 سنة',en:'Operating for %1 years'},
+ mAvgRev:{ar:'متوسط المبيعات الشهرية',en:'Avg. monthly sales'},mAvgExp:{ar:'متوسط المصروفات',en:'Avg. expenses'},mAvgProfit:{ar:'متوسط صافي الربح',en:'Avg. net profit'},mMargin:{ar:'هامش صافي الربح',en:'Net margin'},
+ mGross:{ar:'هامش الربح الإجمالي',en:'Gross margin'},mBreak:{ar:'نقطة التعادل (مبيعات شهرية)',en:'Break-even (monthly sales)'},mSafety:{ar:'هامش الأمان',en:'Margin of safety'},mGrowth:{ar:'نمو المبيعات / شهر',en:'Sales growth / month'},
+ mLiab:{ar:'الالتزامات الحالية',en:'Current liabilities'},mCash:{ar:'متوسط التدفق النقدي',en:'Avg. cash flow'},
+ flagsH:{ar:'مؤشرات المخاطر والتنبيهات',en:'Risk & anomaly alerts'},noFlags:{ar:'لا توجد تنبيهات.',en:'No alerts.'},
+ f_no_data:{ar:'لا توجد بيانات مالية.',en:'No financial data.'},f_thin_data:{ar:'بيانات قليلة (%1 شهور فقط) — التقييم أقل موثوقية.',en:'Little data (%1 months) — rating is less reliable.'},
+ f_loss_months:{ar:'%1 شهور حققت خسارة.',en:'%1 month(s) with a loss.'},f_sales_decline:{ar:'المبيعات في تراجع آخر ٤ شهور.',en:'Sales fell over the last 4 months.'},
+ f_expense_spike:{ar:'قفزة غير طبيعية في المصروفات: %1',en:'Unusual expense spike: %1'},f_expenses_exceed_sales:{ar:'المصروفات تجاوزت المبيعات مؤخرًا.',en:'Expenses recently exceeded sales.'},
+ f_declared_sales_mismatch:{ar:'المبيعات المعلنة (%1) تختلف عن الفعلية (%2).',en:'Declared sales (%1) differ from actual (%2).'},f_declared_profit_mismatch:{ar:'الربح المعلن (%1) يختلف عن الفعلي (%2).',en:'Declared profit (%1) differs from actual (%2).'},
+ f_high_debt:{ar:'مديونية مرتفعة (%1% من المبيعات السنوية).',en:'High debt (%1% of annual sales).'},f_debt_growing:{ar:'الالتزامات في ازدياد.',en:'Liabilities are growing.'},
+ f_negative_cash:{ar:'متوسط التدفق النقدي سالب.',en:'Average cash flow is negative.'},f_mostly_unverified:{ar:'معظم البيانات المالية لم يتم التحقق منها بعد (%1% موثّق).',en:'Most figures are not yet verified (%1% verified).'},
+ f_identical_revenue:{ar:'مبيعات متطابقة تمامًا كل شهر — يحتاج مراجعة.',en:'Identical sales every month — needs review.'},f_round_numbers:{ar:'كل المبيعات أرقام مستديرة — يحتاج مراجعة.',en:'All sales are round numbers — needs review.'},
+ f_identical_expenses:{ar:'مصروفات متطابقة تمامًا كل شهر — يحتاج مراجعة.',en:'Identical expenses every month — needs review.'},
+ valH:{ar:'تقدير استرشادي لقيمة المشروع',en:'Indicative valuation'},valNote:{ar:'تقدير آلي مبني على الأرباح/المبيعات وتقييم المشروع، وليس تقييمًا رسميًا.',en:'Automated estimate from profit/sales and rating; not a formal appraisal.'},
+ finTable:{ar:'البيانات الشهرية',en:'Monthly data'},month:{ar:'الشهر',en:'Month'},revenue:{ar:'المبيعات',en:'Sales'},expenses:{ar:'المصروفات',en:'Expenses'},profit:{ar:'الربح',en:'Profit'},verifiedCol:{ar:'موثّق',en:'Verified'},
+ anaNote:{ar:'البيانات مقدمة من صاحب المشروع وما عليه علامة ✓ تمت مراجعته. التقييم ليس ضمانًا لنجاح المشروع أو استرداد رأس المال.',en:'Figures are provided by the owner; ✓ marks reviewed months. A rating is not a guarantee of success or return of capital.'},
+ /* contracts */
+ contractH:{ar:'عقد الاستثمار',en:'Investment contract'},accept:{ar:'أقر بأنني قرأت شروط الاستثمار وأفهم أنه لا توجد أرباح مضمونة وأن رأس المال معرّض للخسارة.',en:'I have read the terms and understand there are no guaranteed profits and my capital is at risk.'},
+ sigName:{ar:'اكتب اسمك الكامل كتوقيع إلكتروني',en:'Type your full name as e-signature'},e_contract_required:{ar:'يجب قبول العقد وكتابة الاسم كتوقيع.',en:'You must accept the contract and type your name.'},
+ vault:{ar:'خزنة العقود والمستندات',en:'Document vault'},noContracts:{ar:'لا توجد عقود بعد.',en:'No contracts yet.'},open2:{ar:'عرض',en:'Open'},
+ cPrimary:{ar:'اكتتاب',en:'Subscription'},cSecondary:{ar:'شراء من السوق الثانوي',en:'Resale purchase'},cHash:{ar:'بصمة العقد (SHA-256)',en:'Contract fingerprint (SHA-256)'},
+ cSignedBy:{ar:'وُقّع إلكترونيًا بواسطة',en:'Electronically signed by'},cNote:{ar:'قبول إلكتروني موثّق بالتاريخ والبصمة. هذا ليس توقيعًا إلكترونيًا معتمدًا قانونيًا حتى يتم ربطه بمزوّد توقيع مرخّص.',en:'Electronic acceptance recorded with timestamp and fingerprint. Not a qualified e-signature until integrated with a licensed provider.'},
+ print:{ar:'طباعة',en:'Print'},cTerms:{ar:'الشروط',en:'Terms'},
+ /* reports / community */
+ reportsH:{ar:'التقارير الشهرية',en:'Monthly reports'},holdersOnly:{ar:'التقارير متاحة للمستثمرين في المشروع فقط.',en:'Reports are visible to the project\'s investors only.'},noReports:{ar:'لا توجد تقارير بعد.',en:'No reports yet.'},
+ rSummary:{ar:'ملخص الأداء',en:'Performance summary'},rChallenges:{ar:'التحديات',en:'Challenges'},rNext:{ar:'خطة الشهر القادم',en:'Next month plan'},rSales:{ar:'المبيعات ($)',en:'Sales ($)'},rExp:{ar:'المصروفات ($)',en:'Expenses ($)'},
+ publishReport:{ar:'نشر التقرير',en:'Publish report'},reportDone:{ar:'تم نشر التقرير وإشعار المستثمرين.',en:'Report published; investors notified.'},
+ qaH:{ar:'الأسئلة والتحديثات',en:'Q&A and updates'},askQ:{ar:'اكتب سؤالك لصاحب المشروع',en:'Ask the owner a question'},send:{ar:'إرسال',en:'Send'},postUpdate:{ar:'نشر تحديث للمستثمرين',en:'Post an update'},
+ answer:{ar:'رد',en:'Reply'},kUpdate:{ar:'تحديث',en:'Update'},kQuestion:{ar:'سؤال',en:'Question'},kAnswer:{ar:'إجابة المالك',en:'Owner answer'},noPosts:{ar:'لا توجد أسئلة أو تحديثات بعد.',en:'No questions or updates yet.'},
+ pollsH:{ar:'التصويت',en:'Voting'},vote:{ar:'صوّت',en:'Vote'},voted:{ar:'تم تصويتك',en:'You voted'},pollClosed:{ar:'انتهى',en:'Closed'},pollWeight:{ar:'الأصوات موزونة بعدد الأسهم.',en:'Votes are weighted by shares held.'},
+ newPoll:{ar:'إنشاء تصويت',en:'Create a poll'},pollQ:{ar:'السؤال',en:'Question'},pollOpts:{ar:'الخيارات (سطر لكل خيار)',en:'Options (one per line)'},pollDays:{ar:'مدة التصويت (أيام)',en:'Duration (days)'},
+ repH:{ar:'سجل صاحب المشروع',en:'Owner track record'},repProj:{ar:'مشروعات معتمدة',en:'Approved projects'},repRaised:{ar:'إجمالي ما جمعه',en:'Total raised'},repReports:{ar:'تقارير منشورة',en:'Reports published'},repPay:{ar:'توزيعات',en:'Payouts'},repScore:{ar:'متوسط التقييم',en:'Avg. rating'},
+ assistH:{ar:'المساعد الذكي',en:'AI assistant'},assistPh:{ar:'اسأل عن هذا المشروع…',en:'Ask about this project…'},assistNote:{ar:'يجيب من بيانات المنصة فقط، ولا يقدّم قرارات استثمار.',en:'Answers from platform data only; it does not give investment decisions.'},
+ /* manage */
+ manage:{ar:'إدارة المشروع',en:'Manage project'},finEntry:{ar:'إدخال البيانات المالية الشهرية',en:'Monthly financial data'},csvH:{ar:'أو الصق بيانات CSV (سطر لكل شهر)',en:'Or paste CSV (one line per month)'},
+ csvHint:{ar:'الأعمدة: الشهر,المبيعات,تكلفة البضاعة,مصروفات مباشرة,غير مباشرة,رواتب,إيجار,مرافق,عمولات,تسويق,أخرى,أقساط ديون,إجمالي الالتزامات',en:'Columns: month,sales,COGS,direct,indirect,payroll,rent,utilities,commissions,marketing,other,debt payments,liabilities'},
+ saveMonth:{ar:'حفظ الشهر',en:'Save month'},importCsv:{ar:'استيراد',en:'Import'},del:{ar:'حذف',en:'Delete'},finSaved:{ar:'تم حفظ البيانات المالية.',en:'Financial data saved.'},
+ fl_revenue:{ar:'المبيعات',en:'Sales'},fl_cogs:{ar:'تكلفة البضاعة المباعة',en:'COGS'},fl_direct:{ar:'مصروفات مباشرة',en:'Direct expenses'},fl_indirect:{ar:'مصروفات غير مباشرة',en:'Indirect expenses'},
+ fl_payroll:{ar:'الرواتب',en:'Payroll'},fl_rent:{ar:'الإيجار',en:'Rent'},fl_utilities:{ar:'الكهرباء والمرافق',en:'Utilities'},fl_commissions:{ar:'العمولات',en:'Commissions'},
+ fl_marketing:{ar:'التسويق',en:'Marketing'},fl_other:{ar:'مصروفات أخرى',en:'Other'},fl_debtPayments:{ar:'أقساط الديون',en:'Debt payments'},fl_liabilities:{ar:'إجمالي الالتزامات',en:'Total liabilities'},
+ aiRead:{ar:'قراءة بالذكاء الاصطناعي',en:'Read with AI'},aiNote:{ar:'يرسل المستند إلى خدمة Anthropic لاستخراج الأرقام. راجعها قبل الحفظ.',en:'Sends the document to Anthropic to extract figures. Review before saving.'},aiFilled:{ar:'تم ملء النموذج بالأرقام المستخرجة — راجعها ثم احفظ.',en:'Form filled with extracted figures — review, then save.'},
+ e_ai_not_configured:{ar:'خدمة الذكاء الاصطناعي غير مفعّلة على هذا الخادم.',en:'AI is not enabled on this server.'},e_ai_failed:{ar:'تعذّر الاتصال بخدمة الذكاء الاصطناعي.',en:'AI service failed.'},
+ e_holders_only:{ar:'متاح للمستثمرين في المشروع فقط.',en:'Only for this project\'s investors.'},e_already_voted:{ar:'لقد صوّتَّ بالفعل.',en:'You already voted.'},
+ e_totp_required:{ar:'أدخل رمز المصادقة الثنائية.',en:'Enter your 2FA code.'},e_bad_code:{ar:'الرمز غير صحيح.',en:'Invalid code.'},
+ /* simulator */
+ simH:{ar:'محاكي التوسع',en:'Expansion simulator'},simIntro:{ar:'قبل طلب التمويل: احسب تكلفة فرع جديد ونقطة التعادل وفترة الاسترداد تحت ٣ سيناريوهات.',en:'Before applying: estimate a new branch\'s cost, break-even and payback under 3 scenarios.'},
+ s_setup:{ar:'تجهيز وديكور (مرة واحدة)',en:'Fit-out (one-off)'},s_equip:{ar:'المعدات (مرة واحدة)',en:'Equipment (one-off)'},s_deposit:{ar:'تأمين/رسوم ترخيص (مرة واحدة)',en:'Deposits & licences (one-off)'},
+ s_rent:{ar:'الإيجار الشهري',en:'Monthly rent'},s_ins:{ar:'التأمين الشهري',en:'Monthly insurance'},s_pay:{ar:'الرواتب الشهرية',en:'Monthly payroll'},s_mkt:{ar:'التسويق الشهري',en:'Monthly marketing'},s_oth:{ar:'مصروفات تشغيل أخرى شهرية',en:'Other monthly costs'},
+ s_raw:{ar:'الخامات كنسبة من المبيعات (%)',en:'Raw materials (% of sales)'},s_sales:{ar:'المبيعات الشهرية المتوقعة عند النضج',en:'Expected monthly sales at maturity'},s_ramp:{ar:'أشهر الوصول للمبيعات الكاملة',en:'Months to reach full sales'},s_own:{ar:'مساهمتك الذاتية',en:'Your own contribution'},
+ o_total:{ar:'تكلفة التوسع الكاملة (شاملة ٣ شهور رأس مال عامل)',en:'Total expansion cost (incl. 3 months working capital)'},o_fund:{ar:'التمويل المطلوب',en:'Funding needed'},o_fixed:{ar:'المصروفات الثابتة الشهرية',en:'Monthly fixed costs'},o_be:{ar:'مبيعات التعادل الشهرية',en:'Break-even monthly sales'},
+ sc_optimistic:{ar:'متفائل (+٢٠٪)',en:'Optimistic (+20%)'},sc_realistic:{ar:'واقعي',en:'Realistic'},sc_conservative:{ar:'متحفظ (−٣٠٪)',en:'Conservative (−30%)'},
+ scSales:{ar:'المبيعات',en:'Sales'},scMature:{ar:'الربح الشهري عند النضج',en:'Monthly profit at maturity'},scPayback:{ar:'فترة الاسترداد',en:'Payback'},sc24:{ar:'صافي بعد ٢٤ شهرًا',en:'Net after 24 months'},never:{ar:'أكثر من ٥ سنوات',en:'> 5 years'},
+ sf_tight_margin:{ar:'هامش ضيق: مبيعات التعادل قريبة من المتوقعة.',en:'Thin margin: break-even is close to expected sales.'},sf_slow_payback:{ar:'فترة استرداد طويلة (أكثر من ٣٦ شهرًا).',en:'Slow payback (over 36 months).'},
+ sf_loss_if_sales_drop:{ar:'خسارة شهرية لو انخفضت المبيعات ٣٠٪.',en:'Monthly loss if sales drop 30%.'},sf_large_funding:{ar:'التمويل كبير مقارنة بالمبيعات المتوقعة.',en:'Funding is large relative to expected sales.'},
+ /* market / exit */
+ marketH:{ar:'السوق الثانوي للحصص',en:'Resale market'},marketNote:{ar:'يتيح لمستثمر بيع حصصه لمستثمر آخر بعد موافقة الإدارة. يتطلب ترخيصًا تنظيميًا قبل التشغيل الحقيقي.',en:'Lets an investor resell shares to another investor after admin approval. Requires regulatory licensing before real use.'},
+ noListings:{ar:'لا توجد حصص معروضة.',en:'No shares listed.'},pricePS:{ar:'سعر السهم المطلوب',en:'Asking price / share'},faceV:{ar:'القيمة الاسمية',en:'Face value'},buyListing:{ar:'اشترِ الحصة',en:'Buy listing'},
+ exitH:{ar:'طلبات التخارج',en:'Exit requests'},listShares:{ar:'اعرض حصصك للبيع',en:'List shares for sale'},cancel:{ar:'إلغاء',en:'Cancel'},listed2:{ar:'تم إرسال طلب التخارج للمراجعة.',en:'Exit request sent for review.'},
+ bought2:{ar:'تمت عملية الشراء ونُقلت الحصص إليك.',en:'Purchase complete; shares transferred to you.'},st_open:{ar:'معروض',en:'Listed'},st_sold:{ar:'تم البيع',en:'Sold'},st_cancelled:{ar:'ملغي',en:'Cancelled'},
+ tx_sale:{ar:'بيع حصص',en:'Share sale'},tx_purchase:{ar:'شراء حصص',en:'Share purchase'},
+ /* account */
+ accountH:{ar:'حسابي',en:'My account'},profileH:{ar:'ملفي الاستثماري',en:'Investor profile'},riskTol:{ar:'الخطورة التي أتحملها',en:'Risk I can accept'},experience:{ar:'خبرتي الاستثمارية',en:'Investing experience'},
+ ex_beginner:{ar:'مبتدئ',en:'Beginner'},ex_intermediate:{ar:'متوسط',en:'Intermediate'},ex_expert:{ar:'خبير',en:'Expert'},
+ secH:{ar:'المصادقة الثنائية (2FA)',en:'Two-factor authentication'},secOn:{ar:'المصادقة الثنائية مفعّلة.',en:'2FA is enabled.'},secSetup:{ar:'تفعيل',en:'Enable'},secSecret:{ar:'أضف هذا المفتاح في تطبيق المصادقة (Google/Microsoft Authenticator) ثم أدخل الرمز:',en:'Add this key to your authenticator app, then enter the code:'},
+ code:{ar:'الرمز (٦ أرقام)',en:'Code (6 digits)'},secEnable:{ar:'تأكيد التفعيل',en:'Confirm'},secDisable:{ar:'تعطيل',en:'Disable'},secDone:{ar:'تم تفعيل المصادقة الثنائية.',en:'2FA enabled.'},secOff:{ar:'تم التعطيل.',en:'2FA disabled.'},
+ profSaved:{ar:'تم حفظ الملف.',en:'Profile saved.'},
+ complH:{ar:'مركز حماية المستثمر والشكاوى',en:'Investor protection & complaints'},subject:{ar:'الموضوع',en:'Subject'},body:{ar:'التفاصيل',en:'Details'},compSent:{ar:'تم إرسال الشكوى.',en:'Complaint submitted.'},
+ cs_open:{ar:'قيد المعالجة',en:'Open'},cs_resolved:{ar:'تم الحل',en:'Resolved'},reply:{ar:'رد الإدارة',en:'Admin reply'},
+ notifH:{ar:'الإشعارات',en:'Notifications'},markRead:{ar:'تعليم الكل كمقروء',en:'Mark all read'},noNotif:{ar:'لا توجد إشعارات.',en:'No notifications.'},
+ n_new_project:{ar:'فرصة استثمارية جديدة: %1',en:'New opportunity: %1'},n_report:{ar:'تقرير شهري جديد (%2) — %1',en:'New monthly report (%2) — %1'},n_update:{ar:'تحديث جديد من المشروع: %1',en:'New update from %1'},
+ n_payout:{ar:'تم إضافة %2 إلى محفظتك من %1',en:'%2 credited to your wallet from %1'},n_poll:{ar:'تصويت جديد في %1',en:'New vote in %1'},n_question:{ar:'سؤال جديد على مشروعك %1',en:'New question on your project %1'},
+ n_answer:{ar:'تم الرد على سؤالك في %1',en:'Your question in %1 was answered'},n_kyc_approved:{ar:'تم اعتماد هويتك ✔',en:'Your identity was approved ✔'},n_kyc_rejected:{ar:'تم رفض التحقق من الهوية. %3',en:'Identity verification rejected. %3'},
+ n_withdrawal_paid:{ar:'تم تنفيذ سحب %2',en:'Withdrawal of %2 was paid'},n_withdrawal_rejected:{ar:'تم رفض طلب سحب %2 وأُعيد المبلغ لمحفظتك',en:'Withdrawal of %2 rejected and refunded'},
+ n_project_approved:{ar:'تم اعتماد مشروعك %1',en:'Your project %1 was approved'},n_project_rejected:{ar:'تم رفض مشروعك %1. %3',en:'Your project %1 was rejected. %3'},n_risk_changed:{ar:'تغيّر تقييم المخاطرة في %1',en:'Risk rating changed for %1'},
+ n_fully_funded:{ar:'اكتمل تمويل %1 🎉',en:'%1 is fully funded 🎉'},n_almost_funded:{ar:'%1 اقترب من اكتمال التمويل',en:'%1 is almost fully funded'},
+ n_exit_approved:{ar:'تمت الموافقة على عرض حصصك في %1',en:'Your listing for %1 was approved'},n_exit_rejected:{ar:'تم رفض طلب التخارج في %1',en:'Your exit request for %1 was rejected'},n_exit_sold:{ar:'تم بيع حصصك في %1 بمبلغ %2',en:'Your shares in %1 were sold for %2'},n_complaint_resolved:{ar:'تم الرد على شكواك',en:'Your complaint has a reply'},
+ recH:{ar:'مقترحة لك',en:'Suggested for you'},recWhy:{ar:'تناسب مستوى المخاطرة الذي حددته وتنوّع محفظتك',en:'Fits your risk level and diversifies your portfolio'},
+ cmpH:{ar:'مقارنة المشروعات',en:'Compare projects'},cmpEmpty:{ar:'أضف مشروعات للمقارنة من صفحة المشروعات (حتى ٤).',en:'Add projects to compare from the project list (up to 4).'},cmpRemove:{ar:'إزالة',en:'Remove'},
+ cmpGrade:{ar:'التقييم',en:'Rating'},cmpGoal:{ar:'هدف التمويل',en:'Goal'},cmpExp:{ar:'العائد المتوقع (تقدير المالك)',en:'Owner\'s expected return'},cmpFlags:{ar:'عدد التنبيهات',en:'Alerts'},cmpVal:{ar:'القيمة الاسترشادية',en:'Indicative value'},
+ /* admin */
+ tExits:{ar:'طلبات التخارج',en:'Exits'},tComp:{ar:'الشكاوى',en:'Complaints'},verifyAll:{ar:'توثيق كل الشهور',en:'Verify all months'},unverifyAll:{ar:'إلغاء التوثيق',en:'Unverify'},resolve:{ar:'حل الشكوى',en:'Resolve'},
+ /* academy */
+ acH:{ar:'أكاديمية المستثمر',en:'Investment academy'},
+ ac1t:{ar:'ما هو الاستثمار الجماعي بالأسهم؟',en:'What is share crowdfunding?'},ac1:{ar:'تشتري حصة (أسهم) في مشروع قائم مقابل نصيب من أرباحه حسب شروط العقد. أنت شريك في النتيجة: قد تربح وقد تخسر.',en:'You buy shares in an existing business in exchange for a part of its profits as set in the contract. You share the outcome: you can gain or lose.'},
+ ac2t:{ar:'لا توجد أرباح مضمونة',en:'No guaranteed profits'},ac2:{ar:'أي رقم عائد تراه هو تقدير من صاحب المشروع. قد يقل العائد أو يتأخر أو ينعدم، وقد تفقد رأس المال كله.',en:'Any return figure is the owner\'s estimate. Returns may be lower, late or zero and you can lose all your capital.'},
+ ac3t:{ar:'كيف تقرأ البيانات المالية؟',en:'How to read the financials'},ac3:{ar:'ركّز على صافي الربح لا المبيعات فقط، وعلى نقطة التعادل وهامش الأمان، واتجاه المبيعات عبر الشهور، وحجم الديون بالنسبة للمبيعات.',en:'Look at net profit, not just sales; at break-even and margin of safety; at the sales trend over months; and at debt relative to sales.'},
+ ac4t:{ar:'نوّع استثماراتك',en:'Diversify'},ac4:{ar:'لا تضع كل أموالك في مشروع أو قطاع واحد. وزّع على عدة مشروعات بمستويات مخاطرة مختلفة، واستثمر فقط ما تتحمل خسارته.',en:'Do not put everything in one project or sector. Spread across several projects and risk levels, and invest only what you can afford to lose.'},
+ ac5t:{ar:'الاستثمار غير سائل',en:'Investments are illiquid'},ac5:{ar:'قد لا تستطيع بيع حصصك قبل نهاية المدة. السوق الثانوي (إن توفر) لا يضمن وجود مشترٍ ولا سعرًا عادلًا.',en:'You may not be able to sell before the term ends. A resale market (if available) does not guarantee a buyer or a fair price.'},
+ ac6t:{ar:'علامات تحذير',en:'Red flags'},ac6:{ar:'مبيعات متطابقة كل شهر، أرقام مستديرة، اختلاف بين المعلن والفعلي، غياب المستندات، ووعود بعوائد عالية جدًا. استخدم مركز الشكاوى عند الشك.',en:'Identical monthly sales, round numbers, declared vs actual mismatch, missing documents, and promises of very high returns. Use the complaints centre if in doubt.'},
  c_agri:{ar:'زراعة',en:'Agriculture'},c_food:{ar:'أغذية ومشروبات',en:'Food & Drink'},c_energy:{ar:'طاقة',en:'Energy'},
  c_real:{ar:'عقارات',en:'Real Estate'},c_tech:{ar:'تقنية',en:'Technology'},c_retail:{ar:'تجارة',en:'Retail'},c_other:{ar:'أخرى',en:'Other'}
 };
@@ -223,7 +323,7 @@ function applyLang(){document.documentElement.lang=lang;document.documentElement
    On a static host such as GitHub Pages there is no /api, so the very same API is
    emulated on top of localStorage. This is a DEMO: data lives only in this browser. */
 let STATIC=false,S=null;
-const MK='tw_static_v3';
+const MK='tw_static_v4';
 const sErr=c=>{const e=new Error(c);e.code=c;return e};
 const sSave=()=>{try{localStorage.setItem(MK,JSON.stringify(S))}catch(e){}};
 const sId=()=>++S.n;
@@ -248,12 +348,13 @@ function sPayout(owner,pid,amt,note){const p=S.projects.find(x=>x.id===pid&&x.oi
   S.payouts.push({id:sId(),pid,amount:amt,note,created:Date.now()});h.forEach(x=>x.c>0&&sTxAdd(x.uid,'income',x.c,pid,note));return h.length}
 function sLoad(){
   try{const d=JSON.parse(localStorage.getItem(MK));if(d&&d.users){S=d;return}}catch(e){}
-  S={n:100,session:null,users:[],projects:[],inv:[],payouts:[],tx:[]};
+  S={n:100,session:null,users:[],projects:[],inv:[],payouts:[],tx:[],fin:{}};
   const o={id:sId(),name:'صاحب مشروع تجريبي',email:'owner@demo.com',pass:'demo12345',role:'owner'};
   const i={id:sId(),name:'مستثمر تجريبي',email:'investor@demo.com',pass:'demo12345',role:'investor'};S.users.push(o,i);
   const a=sAddProject(o.id,{title:'مزرعة الوادي الأخضر للزيتون',category:'agri',goal:50000,sharePrice:100,description:'توسعة مزرعة الزيتون العائلية بمعصرة جديدة و٢٠٠٠ شجرة إضافية. يأتي الدخل من بيع زيت الزيتون الفاخر.'});
   const b=sAddProject(o.id,{title:'محمصة قهوة المدينة',category:'food',goal:30000,sharePrice:50,description:'محمصة قهوة تزوّد ٣٠ مقهى في الحي. تُستخدم الأموال لشراء آلة تحميص ثانية وخط تغليف.'});
   sAddProject(o.id,{title:'ألواح شمسية لمدرسة النور',category:'energy',goal:80000,sharePrice:200,description:'تركيب ألواح شمسية على السطح وبيع فائض الكهرباء للشبكة. يُوزَّع الدخل من مبيعات الطاقة الشهرية.'});
+  S.fin[a.id]={};for(let m=1;m<=9;m++){const mo='2026-0'+m;S.fin[a.id][mo]={month:mo,revenue:17000+m*450+(m%3)*300,cogs:6200+(m%4)*150,direct:900,indirect:700,payroll:3900,rent:1500,utilities:450,commissions:200,marketing:600,other:250,debtPayments:400,liabilities:14000-m*300,verified:m<=5}}
   sTxAdd(i.id,'deposit',2500000);sBuy(i,a.id,120);sBuy(i,b.id,80);sPayout(o,a.id,120000,'مبيعات الزيت للربع الثالث');sSave();
 }
 async function staticApi(method,url,body){
@@ -284,6 +385,12 @@ async function staticApi(method,url,body){
       return{id:pid,title:p.title,shares:sh,totalShares:p.total,invested:sh*p.price/100,income:inc(pid)/100}});
     return{balance:sBal(u.id)/100,holdings,totalIncome:S.tx.filter(x=>x.uid===u.id&&x.type==='income').reduce((a,x)=>a+x.amount,0)/100,
       history:S.tx.filter(x=>x.uid===u.id).slice().reverse().map(x=>({id:x.id,type:x.type,amount:x.amount/100,note:x.note,project:(S.projects.find(p=>p.id===x.pid)||{}).title||null,date:x.created}))}}
+  if(m=url.match(/^\/api\/projects\/(\d+)\/analysis$/)){const pid=+m[1];if(!S.projects.find(x=>x.id===pid))throw sErr('not_found');
+    const rows=Object.values((S.fin||{})[pid]||{}).sort((a,b)=>a.month<b.month?-1:1);return{...TWAnalysis.analyze(rows,{docKinds:0}),rows}}
+  if((m=url.match(/^\/api\/projects\/(\d+)\/financials$/))&&method==='PUT'){const u=need('owner'),pid=+m[1];if(!S.projects.find(x=>x.id===pid&&x.oid===u.id))throw sErr('not_found');
+    S.fin=S.fin||{};S.fin[pid]=S.fin[pid]||{};if(!Array.isArray(body.rows)||!body.rows.length)throw sErr('bad_input');
+    body.rows.forEach(r=>{if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(r.month))throw sErr('bad_input');const o={month:r.month,verified:false};TWAnalysis.FIELDS.forEach(k=>o[k]=Math.max(0,+r[k]||0));S.fin[pid][r.month]=o});return done({ok:true})}
+  if((m=url.match(/^\/api\/projects\/(\d+)\/financials\/(\d{4}-\d{2})$/))&&method==='DELETE'){const u=need('owner');if(S.fin&&S.fin[+m[1]])delete S.fin[+m[1]][m[2]];return done({ok:true})}
   if(url==='/api/owner/dashboard'){const u=need('owner');
     return S.projects.filter(p=>p.oid===u.id).reverse().map(p=>{const by={};S.inv.filter(x=>x.pid===p.id).forEach(x=>by[x.uid]=(by[x.uid]||0)+x.shares);
       return{...sProj(p),investors:Object.entries(by).map(([id,sh])=>({name:S.users.find(x=>x.id===+id).name,shares:sh,amount:sh*p.price/100})).sort((a,b)=>b.shares-a.shares),
@@ -320,8 +427,8 @@ function go(h){if(location.hash===h)render();else location.hash=h}
 /* ---------- nav ---------- */
 function nav(){
   $('#nav').innerHTML=`<a class="logo" href="#/">${lang==='ar'?'تمويل <span>شيرز</span>':'Tamweel <span>Shares</span>'}</a>
-   <a href="#/">${t('projects')}</a>`+(me?
-   `<a href="#/dashboard">${t('dash')}</a><span class="mut">${esc(me.name)} · ${t(me.role)}</span><button class="btn ghost sm" onclick="logout()">${t('logout')}</button>`:
+   <a href="#/">${t('projects')}</a><a href="#/compare">${t('navCompare')}${cmpGet().length?' ('+cmpGet().length+')':''}</a><a href="#/academy">${t('navAcademy')}</a>`+(me?
+   `<a href="#/dashboard">${t('dash')}</a>${me.role==='investor'&&!STATIC?`<a href="#/market">${t('navMarket')}</a>`:''}${me.role==='owner'?`<a href="#/simulator">${t('navSim')}</a>`:''}${me.role!=='admin'&&!STATIC?`<a href="#/account">${t('navAccount')}</a>`:''}${!STATIC?`<a href="#/notifications" title="${t('notifH')}">🔔${unread?`<b style="color:#b91c1c"> ${unread}</b>`:''}</a>`:''}<span class="mut">${esc(me.name)} · ${t(me.role)}</span><button class="btn ghost sm" onclick="logout()">${t('logout')}</button>`:
    `<a href="#/login">${t('login')}</a><a class="btn sm" href="#/signup">${t('signup')}</a>`)+
    `<button class="btn ghost sm" onclick="setLang('${lang==='ar'?'en':'ar'}')">${t('langBtn')}</button>`;
 }
@@ -336,7 +443,7 @@ function projectCard(p){
   <div class="prog"><i style="width:${pct(p)}%"></i></div>
   <div class="row"><b>${money(p.raised)}</b><span class="mut">${t('of')} ${money(p.goal)} · ${num(pct(p))}%</span></div>
   <div class="row mut" style="margin:6px 0 12px"><span>${money(p.sharePrice)} ${t('perShare')}</span><span>${num(p.totalShares-p.sold)} ${t('left')}</span></div>
-  <a class="btn sm" href="#/project/${p.id}">${t('viewInvest')}</a></div>`;
+  <a class="btn sm" href="#/project/${p.id}">${t('viewInvest')}</a> <button class="btn ghost sm" onclick="cmpToggle(${p.id})">${cmpGet().includes(p.id)?t('compareDel'):t('compareAdd')}</button></div>`;
 }
 let homeList=[],flt={q:'',cat:'',risk:'',st:''};
 function gridHtml(){
@@ -360,7 +467,7 @@ async function vHome(){
    <select onchange="setFlt('risk',this.value)">${opt('',t('allRisk'),flt.risk)}${['low','medium','high'].map(r=>opt(r,t('r_'+r),flt.risk)).join('')}</select>
    <select onchange="setFlt('st',this.value)">${opt('',t('anyStatus'),flt.st)}${opt('open',t('stOpen'),flt.st)}${opt('full',t('stFull'),flt.st)}</select></div>
   <div class="warn">${t('riskNote')}</div>
-  <div class="grid" id="grid">${gridHtml()}</div>`;
+  <div class="grid" id="grid">${gridHtml()}</div>${await recsHtml()}`;
 }
 function calcUpdate(price,total){
   const amt=+$('#c_amt').value||0,ret=+$('#c_ret').value||0,mon=+$('#c_mon').value||0;
@@ -384,7 +491,7 @@ async function vProject(id){
    <form class="f" onsubmit="return buy(event,${p.id})">
    <label>${t('qty')} ${num(left)}, ${t('minInv')}: ${num(minS)})<input type="number" id="qty" min="${minS}" max="${left}" step="1" value="${minS}" required oninput="$('#cost').textContent=money(this.value*${p.sharePrice})"></label>
    <div class="row"><span>${t('total')}</span><b id="cost">${money(minS*p.sharePrice)}</b></div>
-   <button class="btn">${t('confirm')}</button></form>`;
+   ${STATIC?'':signHtml()}<button class="btn">${t('confirm')}</button></form>`;
   const kv=(k,v)=>!v?'':`<dt>${t(k)}</dt><dd>${v}</dd>`;
   const txt=(k,v)=>v?`<h3>${t(k)}</h3><p style="white-space:pre-line">${esc(v)}</p>`:'';
   const details=`<h3>${t('projInfo')}</h3><dl class="kv">${kv('location',esc(p.location))}${kv('founded',p.foundedYear&&num(p.foundedYear).replace(/[٬,]/g,''))}${kv('branches',p.branches!=null&&num(p.branches))}${kv('employees',p.employees!=null&&num(p.employees))}
@@ -397,17 +504,18 @@ async function vProject(id){
    <label>${t('calcRet')}<input type="number" id="c_ret" step="0.5" value="${p.expectedReturn??15}" oninput="calcUpdate(${p.sharePrice},${p.totalShares})"></label>
    <label>${t('calcMon')}<input type="number" id="c_mon" min="1" step="1" value="${p.durationMonths||12}" oninput="calcUpdate(${p.sharePrice},${p.totalShares})"></label></div>
    <div id="calcOut"></div><div class="warn">${t('calcWarn')}</div></div>`;
-  setTimeout(()=>{if($('#c_amt'))calcUpdate(p.sharePrice,p.totalShares)},0);
+  window._post=()=>{if($('#c_amt'))calcUpdate(p.sharePrice,p.totalShares);loadExtras(p)};
+  let following=false;if(!STATIC&&me){try{following=(await api('GET','/api/follows')).includes(p.id)}catch(e){}}
   return `<p><a href="#/">${t('back')}</a></p>${flash}<div class="two"><div><div class="card"><span class="tag">${catName(p.category)}</span>${p.risk?riskTag(p.risk):''}
   <h1 style="margin:8px 0">${esc(p.title)}</h1><p class="mut">${t('by')} ${esc(p.owner)} · ${t('listed')} ${fdate(p.created)}</p><p>${esc(p.description)}</p>
   <div class="prog"><i style="width:${pct(p)}%"></i></div>
   <div class="stats"><div class="stat"><small>${t('raised')}</small><b>${money(p.raised)}</b></div><div class="stat"><small>${t('goal')}</small><b>${money(p.goal)}</b></div>
-  <div class="stat"><small>${t('sharePrice')}</small><b>${money(p.sharePrice)}</b></div><div class="stat"><small>${t('sharesLeft')}</small><b>${num(left)}/${num(p.totalShares)}</b></div></div>${details}</div>${calc}</div>
-  <div><div class="card">${box}</div><div class="warn">${t('riskNote')}</div></div></div>`;
+  <div class="stat"><small>${t('sharePrice')}</small><b>${money(p.sharePrice)}</b></div><div class="stat"><small>${t('sharesLeft')}</small><b>${num(left)}/${num(p.totalShares)}</b></div></div>${details}</div>${calc}<div id="pExtra"></div></div>
+  <div><div class="card">${box}</div><p>${!STATIC&&me&&p.status==='approved'?`<button class="btn ghost sm" onclick="toggleFollow(${p.id},${following})">${t(following?'unfollow':'follow')}</button> `:''}<button class="btn ghost sm" onclick="cmpToggle(${p.id})">${cmpGet().includes(p.id)?t('compareDel'):t('compareAdd')}</button></p><div class="warn">${t('riskNote')}</div></div></div>`;
 }
 async function buy(e,id){
   e.preventDefault();const q=parseInt($('#qty').value);
-  try{await api('POST',`/api/projects/${id}/buy`,{shares:q});await loadMe();msg(t('bought',num(q)))}catch(x){msg(errText(x),1)}
+  try{await api('POST',`/api/projects/${id}/buy`,{shares:q,accept:$('#acc')?$('#acc').checked:undefined,signature:$('#sig')?$('#sig').value:undefined});await loadMe();msg(t('bought',num(q)))}catch(x){msg(errText(x),1)}
   render();return false;
 }
 function vAuth(mode){
@@ -418,6 +526,7 @@ function vAuth(mode){
   <label>${t('fullName')}<input id="name" required maxlength="80" autocomplete="name"></label>`:''}
   ${su?`<label>${t('phone')}<input id="phone" type="tel" class="ltr" autocomplete="tel" maxlength="20"></label><label>${t('company')}<input id="company" maxlength="120"></label>`:''}
   <label>${t('email')}<input id="email" type="email" required class="ltr" autocomplete="email"></label>
+ ${su?'':`<label id="codeRow" style="display:none">${t('code')}<input id="code" class="ltr" maxlength="6" inputmode="numeric"></label>`}
   <label>${t('pass')}<input id="pass" type="password" required minlength="${su?8:1}" class="ltr" autocomplete="${su?'new-password':'current-password'}"></label>
   <button class="btn">${su?t('signup'):t('login')}</button></form>
   <p class="mut">${su?`${t('haveAcc')} <a href="#/login">${t('login')}</a>`:`${t('newHere')} <a href="#/signup">${t('signup')}</a>`}</p></div>`;
@@ -430,8 +539,8 @@ async function doSignup(e){
 }
 async function doLogin(e){
   e.preventDefault();
-  try{await api('POST','/api/login',{email:$('#email').value,password:$('#pass').value});await loadMe();flash='';go('#/dashboard')}
-  catch(x){msg(errText(x),1);render()}
+  try{await api('POST','/api/login',{email:$('#email').value,password:$('#pass').value,code:$('#code')&&$('#code').value||undefined});await loadMe();flash='';go('#/dashboard')}
+  catch(x){if(x.code==='totp_required'){const r=$('#codeRow');if(r){r.style.display='grid';$('#code').focus();return false}}msg(errText(x),1);render()}
   return false;
 }
 
@@ -526,7 +635,7 @@ function ownerProject(p){
    <form class="f" style="max-width:none;grid-template-columns:1fr 1.4fr auto;align-items:end" onsubmit="return uploadDoc(event,${p.id})">
    <label>${t('kind')}<select name="kind">${DOCK.map(k=>`<option value="${k}">${t('d_'+k)}</option>`).join('')}</select></label>
    <label>${t('file')}<input name="file" type="file" accept=".pdf,.png,.jpg,.jpeg" required></label><button class="btn sm">${t('upload')}</button></form></div>`:'';
-  return `<div class="card" style="margin-bottom:16px"><div class="row"><h3 style="margin:0">${esc(p.title)} <span class="risk st-${st}">${t('s_'+st)}</span> ${p.risk&&st==='approved'?riskTag(p.risk):''}</h3><a href="#/project/${p.id}">${t('publicPage')}</a></div>
+  return `<div class="card" style="margin-bottom:16px"><div class="row"><h3 style="margin:0">${esc(p.title)} <span class="risk st-${st}">${t('s_'+st)}</span> ${p.risk&&st==='approved'?riskTag(p.risk):''}</h3><span><a href="#/manage/${p.id}">${t('manage')}</a> · <a href="#/project/${p.id}">${t('publicPage')}</a></span></div>
   ${p.adminNote?`<div class="warn"><b>${t('adminNote')}:</b> ${esc(p.adminNote)}</div>`:''}
   <div class="prog"><i style="width:${pct(p)}%"></i></div>
   <div class="row"><b>${money(p.raised)} ${t('raisedLow')}</b><span class="mut">${t('goal')} ${money(p.goal)} · ${num(p.sold)}/${num(p.totalShares)} ${t('sold')}</span></div>
@@ -581,12 +690,229 @@ document.addEventListener('input',e=>{
    $('#calc').textContent=g&&p?t('calc',num(Math.floor(g/p))):''}
 });
 
+/* ================= Phase 2–5 views ================= */
+let CFG={ai:false};
+const FLAGSEV={thin_data:1,mostly_unverified:1,loss_months:2,sales_decline:2,expense_spike:2,expenses_exceed_sales:3,declared_sales_mismatch:3,declared_profit_mismatch:3,high_debt:2,debt_growing:2,negative_cash:3,identical_revenue:3,round_numbers:2,identical_expenses:2,no_data:1};
+function flagText(f){
+  const m=x=>money(x);
+  switch(f.code){
+    case 'thin_data':return t('f_thin_data',num(f.months));case 'loss_months':return t('f_loss_months',num(f.count));
+    case 'expense_spike':return t('f_expense_spike',f.months.join(', '));
+    case 'declared_sales_mismatch':case 'declared_profit_mismatch':return t('f_'+f.code,m(f.declared),m(f.actual));
+    case 'high_debt':return t('f_high_debt',num(f.ratio.toFixed(0)));case 'mostly_unverified':return t('f_mostly_unverified',num(f.share.toFixed(0)));
+    default:return t('f_'+f.code);
+  }
+}
+const flagList=fl=>fl.length?`<ul style="margin:6px 0;padding-inline-start:20px">${fl.map(f=>`<li style="color:${(FLAGSEV[f.code]||1)>=3?'#b91c1c':(FLAGSEV[f.code]||1)===2?'#b45309':'#64748b'}">${esc(flagText(f))}</li>`).join('')}</ul>`:`<p class="mut">${t('noFlags')}</p>`;
+function compVal(c){const v=c.v||{},p=x=>num((+x||0).toFixed(1));
+  switch(c.key){case 'stability':return t('rv_stability',num(v.months),p(v.volatility));case 'profitability':return t('rv_profitability',p(v.margin));case 'growth':return t('rv_growth',p(v.growth));
+    case 'cashflow':return t('rv_cashflow',money(v.avgCash));case 'debt':return t('rv_debt',v.ratio==null?'—':p(v.ratio));case 'verification':return t('rv_verification',p(v.share),num(v.docs));
+    default:return t('rv_history',v.age==null?'—':num(v.age))}
+}
+function chartSvg(series){
+  if(!series.length)return '';const W=600,H=170,pad=24,max=Math.max(...series.map(r=>Math.max(r.revenue,r.expenses)),1),bw=(W-pad*2)/series.length;
+  const bars=series.map((r,i)=>{const x=pad+i*bw,h1=(r.revenue/max)*(H-40),h2=(r.expenses/max)*(H-40);
+    return `<rect x="${x+bw*.12}" y="${H-20-h1}" width="${bw*.36}" height="${h1}" fill="#0f766e" rx="2"/><rect x="${x+bw*.52}" y="${H-20-h2}" width="${bw*.36}" height="${h2}" fill="#f59e0b" rx="2"/>
+    ${series.length<=12||i%2===0?`<text x="${x+bw/2}" y="${H-5}" font-size="9" text-anchor="middle" fill="#64748b">${r.month.slice(2)}</text>`:''}`}).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;direction:ltr">${bars}</svg><div class="mut" style="font-size:.8rem"><span style="color:#0f766e">■</span> ${t('revenue')} &nbsp; <span style="color:#f59e0b">■</span> ${t('expenses')}</div>`;
+}
+function analysisHtml(a,{full=true}={}){
+  if(!a||!a.n)return `<div class="card mut" style="margin-top:16px">${t('noFin')}</div>`;
+  const m=a.metrics,r=a.rating,kv=(k,v)=>`<div class="stat"><small>${t(k)}</small><b style="font-size:1.1rem">${v}</b></div>`,pc=x=>x==null?'—':num((+x).toFixed(1))+'%';
+  const rate=r?`<div class="row" style="align-items:center;gap:14px"><div style="font-size:2.6rem;font-weight:800;color:var(--g);line-height:1">${r.grade}</div>
+    <div><b>${t('score')}: ${num(r.score)}/100</b><div class="mut">${t('sugRisk')}: ${riskTag(r.suggestedRisk)}</div></div></div>
+    <div style="margin-top:10px">${r.components.map(c=>`<div style="margin:6px 0"><div class="row" style="font-size:.88rem"><span>${t('rc_'+c.key)}</span><b>${num(c.score)}/${c.max}</b></div>
+    <div class="prog" style="margin:2px 0;height:6px"><i style="width:${c.score/c.max*100}%"></i></div><div class="mut" style="font-size:.78rem">${esc(compVal(c))}</div></div>`).join('')}</div>`:`<p class="mut">${t('f_thin_data',num(a.n))}</p>`;
+  const val=a.valuation?`<h3>${t('valH')}</h3><p><b>${money(a.valuation.low)} – ${money(a.valuation.high)}</b></p><p class="mut" style="font-size:.8rem">${t('valNote')}</p>`:'';
+  return `<div class="card" style="margin-top:16px"><div class="row"><h3 style="margin-top:0">${t('anaH')}</h3><button class="btn ghost sm" onclick="window.print()">${t('print')}</button></div>
+  <div class="two eq"><div>${rate}</div><div>${chartSvg(a.series)}</div></div>
+  <div class="stats">${kv('mAvgRev',money(m.avgRevenue))}${kv('mAvgExp',money(m.avgExpenses))}${kv('mAvgProfit',money(m.avgProfit))}${kv('mMargin',pc(m.netMargin))}
+   ${kv('mGross',pc(m.grossMargin))}${kv('mBreak',m.breakEven==null?'—':money(m.breakEven))}${kv('mSafety',pc(m.marginOfSafety))}${kv('mGrowth',pc(m.growthPerMonth))}${kv('mCash',money(m.avgCash))}${kv('mLiab',money(m.liabilities))}</div>
+  <h3>${t('flagsH')}</h3>${flagList(a.flags)}${val}
+  ${full?`<details><summary class="mut" style="cursor:pointer">${t('finTable')}</summary><div class="tw"><table><tr><th>${t('month')}</th><th>${t('revenue')}</th><th>${t('expenses')}</th><th>${t('profit')}</th><th>${t('verifiedCol')}</th></tr>
+  ${a.series.map(r=>`<tr><td dir="ltr">${r.month}</td><td>${money(r.revenue)}</td><td>${money(r.expenses)}</td><td class="${r.profit>=0?'pos':'neg'}">${money(r.profit)}</td><td>${r.verified?'✓':''}</td></tr>`).join('')}</table></div></details>`:''}
+  <p class="mut" style="font-size:.8rem;margin-bottom:0">${t('anaNote')}</p></div>`;
+}
+
+/* ----- project page extras (loaded after first paint) ----- */
+const cmpGet=()=>{try{return JSON.parse(localStorage.getItem('tw_cmp')||'[]')}catch(e){return[]}};
+function cmpToggle(id){let l=cmpGet();l=l.includes(id)?l.filter(x=>x!==id):[...l,id].slice(-4);try{localStorage.setItem('tw_cmp',JSON.stringify(l))}catch(e){}render()}
+async function toggleFollow(id,on){try{await api(on?'DELETE':'POST',`/api/projects/${id}/follow`,on?undefined:{})}catch(x){msg(errText(x),1)}render()}
+async function loadExtras(p){
+  const box=$('#pExtra');if(!box)return;let h='';
+  try{const a=await api('GET',`/api/projects/${p.id}/analysis`);h+=analysisHtml(a)}catch(e){}
+  if(!STATIC){
+    try{const rep=await api('GET','/api/owners/'+p.ownerId+'/reputation');
+      h+=`<div class="card" style="margin-top:16px"><h3 style="margin-top:0">${t('repH')}: ${esc(rep.name)}</h3><div class="stats">
+      <div class="stat"><small>${t('repProj')}</small><b>${num(rep.projects)}</b></div><div class="stat"><small>${t('repRaised')}</small><b>${money(rep.raised)}</b></div>
+      <div class="stat"><small>${t('repReports')}</small><b>${num(rep.reports)}</b></div><div class="stat"><small>${t('repPay')}</small><b>${num(rep.payouts)}</b></div>
+      <div class="stat"><small>${t('repScore')}</small><b>${rep.avgScore==null?'—':num(rep.avgScore)}</b></div></div></div>`}catch(e){}
+    if(me){try{const reps=await api('GET',`/api/projects/${p.id}/reports`);
+      h+=`<div class="card" style="margin-top:16px"><h3 style="margin-top:0">${t('reportsH')}</h3>${reps.map(r=>`<div style="border-top:1px solid var(--line);padding:8px 0"><b dir="ltr">${r.month}</b>${r.sales!=null?` · ${t('rSales')} ${money(r.sales)}`:''}${r.expenses!=null?` · ${t('rExp')} ${money(r.expenses)}`:''}
+      <p style="margin:4px 0">${esc(r.summary)}</p>${r.challenges?`<p class="mut" style="margin:2px 0">${t('rChallenges')}: ${esc(r.challenges)}</p>`:''}${r.nextPlan?`<p class="mut" style="margin:2px 0">${t('rNext')}: ${esc(r.nextPlan)}</p>`:''}</div>`).join('')||`<p class="mut">${t('noReports')}</p>`}</div>`}
+      catch(e){h+=`<div class="card mut" style="margin-top:16px">${t('reportsH')}: ${t('holdersOnly')}</div>`}}
+    try{const polls=await api('GET',`/api/projects/${p.id}/polls`);
+      if(polls.length)h+=`<div class="card" style="margin-top:16px"><h3 style="margin-top:0">${t('pollsH')}</h3><p class="mut" style="font-size:.8rem">${t('pollWeight')}</p>${polls.map(pl=>{const tot=pl.tally.reduce((a,b)=>a+b,0)||1;
+        return `<div style="margin:10px 0"><b>${esc(pl.question)}</b> ${pl.open?'':`<span class="risk risk-unrated">${t('pollClosed')}</span>`}${pl.options.map((o,i)=>`<div class="row" style="margin-top:4px"><span>${esc(o)} ${pl.myVote===i?'✓':''}</span><span class="mut">${num((pl.tally[i]/tot*100).toFixed(0))}%
+        ${pl.open&&pl.myVote===null&&me&&me.role==='investor'?`<button class="btn sm ghost" onclick="doVote(${pl.id},${i})">${t('vote')}</button>`:''}</span></div><div class="prog" style="margin:2px 0;height:5px"><i style="width:${pl.tally[i]/tot*100}%"></i></div>`).join('')}</div>`}).join('')}</div>`}catch(e){}
+    try{const posts=await api('GET',`/api/projects/${p.id}/posts`);const own=me&&me.id===p.ownerId;
+      const qs=posts.filter(x=>x.kind!=='answer');
+      h+=`<div class="card" style="margin-top:16px"><h3 style="margin-top:0">${t('qaH')}</h3>${qs.map(q=>`<div style="border-top:1px solid var(--line);padding:8px 0"><span class="risk risk-${q.kind==='update'?'low':'unrated'}">${t(q.kind==='update'?'kUpdate':'kQuestion')}</span> <span class="mut">${esc(q.author)} · ${fdate(q.created)}</span>
+        <p style="margin:4px 0;white-space:pre-line">${esc(q.body)}</p>${posts.filter(a=>a.parentId===q.id).map(a=>`<div style="margin-inline-start:18px;padding:6px 10px;background:#f0fdfa;border-radius:8px"><b>${t('kAnswer')}:</b> ${esc(a.body)}</div>`).join('')}
+        ${own&&q.kind==='question'?`<form class="f" style="max-width:none;grid-template-columns:1fr auto;margin-top:6px" onsubmit="return doPost(event,${p.id},${q.id})"><input name="b" required maxlength="1500" placeholder="${t('answer')}"><button class="btn sm">${t('send')}</button></form>`:''}</div>`).join('')||`<p class="mut">${t('noPosts')}</p>`}
+        ${me&&(own||me.role==='investor')?`<form class="f" style="max-width:none;grid-template-columns:1fr auto;margin-top:8px" onsubmit="return doPost(event,${p.id})"><input name="b" required maxlength="1500" placeholder="${own?t('postUpdate'):t('askQ')}"><button class="btn sm">${t('send')}</button></form>`:''}</div>`}catch(e){}
+    if(CFG.ai&&me)h+=`<div class="card" style="margin-top:16px"><h3 style="margin-top:0">${t('assistH')}</h3><form class="f" style="max-width:none;grid-template-columns:1fr auto" onsubmit="return doAsk(event,${p.id})"><input name="q" required minlength="3" maxlength="500" placeholder="${t('assistPh')}"><button class="btn sm">${t('send')}</button></form><div id="aiOut" style="margin-top:8px;white-space:pre-line"></div><p class="mut" style="font-size:.8rem">${t('assistNote')}</p></div>`;
+  }
+  if($('#pExtra'))$('#pExtra').innerHTML=h;
+}
+async function doVote(id,i){try{await api('POST',`/api/polls/${id}/vote`,{option:i})}catch(x){msg(errText(x),1)}render()}
+async function doPost(e,pid,parent){e.preventDefault();try{await api('POST',`/api/projects/${pid}/posts`,{body:e.target.b.value,parentId:parent})}catch(x){msg(errText(x),1)}render();return false}
+async function doAsk(e,pid){e.preventDefault();$('#aiOut').textContent='…';try{$('#aiOut').textContent=(await api('POST','/api/assistant',{question:e.target.q.value,projectId:pid})).answer}catch(x){$('#aiOut').textContent=errText(x)}return false}
+function signHtml(){return `<label style="display:flex;gap:8px;align-items:flex-start;font-weight:400"><input type="checkbox" id="acc" style="width:auto;margin-top:4px" required><span>${t('accept')}</span></label>
+  <label>${t('sigName')}<input id="sig" required minlength="3" maxlength="100" value="${esc(me?me.name:'')}"></label>`}
+
+/* ----- contract page ----- */
+async function vContract(id){
+  const c=await api('GET','/api/contracts/'+id),T2=c.terms;
+  return `<p><a href="#/account">${t('backB')}</a></p><div class="card" style="max-width:720px"><div class="row"><h2 style="margin-top:0">${t('contractH')} #${c.id}</h2><button class="btn ghost sm" onclick="window.print()">${t('print')}</button></div>
+  <p><span class="tag">${t(c.kind==='primary'?'cPrimary':'cSecondary')}</span></p>
+  <dl class="kv"><dt>${t('project')}</dt><dd>${esc(c.project)}</dd><dt>${t('investors')}</dt><dd>${esc(c.investor)}</dd><dt>${t('shares')}</dt><dd>${num(c.shares)}</dd><dt>${t('amount')}</dt><dd>${money(c.amount)}</dd>
+  <dt>${t('sharePrice')}</dt><dd>${money(T2.sharePrice)}</dd>${T2.durationMonths?`<dt>${t('duration')}</dt><dd>${num(T2.durationMonths)} ${t('months')}</dd>`:''}<dt>${t('risk')}</dt><dd>${t('r_'+(T2.risk||'unrated'))}</dd></dl>
+  ${T2.profitTerms?`<h3>${t('profitT')}</h3><p style="white-space:pre-line">${esc(T2.profitTerms)}</p>`:''}${T2.exitTerms?`<h3>${t('exitT')}</h3><p style="white-space:pre-line">${esc(T2.exitTerms)}</p>`:''}
+  ${T2.useOfFunds?`<h3>${t('useFunds')}</h3><p style="white-space:pre-line">${esc(T2.useOfFunds)}</p>`:''}
+  <div class="warn">${t('riskNote')}</div><p>${t('cSignedBy')}: <b>${esc(c.signer)}</b> — ${new Date(c.created).toLocaleString(loc())}</p>
+  <p class="mut ltr" style="font-size:.8rem;word-break:break-all">${t('cHash')}: ${c.hash}</p><p class="mut" style="font-size:.8rem">${t('cNote')}</p></div>`;
+}
+
+/* ----- owner: manage project ----- */
+const FINF=['revenue','cogs','direct','indirect','payroll','rent','utilities','commissions','marketing','other','debtPayments','liabilities'];
+async function vManage(id){
+  const p=await api('GET','/api/projects/'+id),a=await api('GET',`/api/projects/${id}/analysis`);
+  let ai='',reports=[],posts=[],polls=[];
+  if(!STATIC){try{reports=await api('GET',`/api/projects/${id}/reports`)}catch(e){}try{posts=await api('GET',`/api/projects/${id}/posts`)}catch(e){}try{polls=await api('GET',`/api/projects/${id}/polls`)}catch(e){}}
+  const docsAI=CFG.ai&&p.documents&&p.documents.length?`<div class="warn">${t('aiNote')}<br>${p.documents.map(d=>`<button class="btn ghost sm" style="margin:4px 0" onclick="aiFill(${d.id})">${t('aiRead')}: ${esc(d.filename)}</button>`).join(' ')}</div>`:'';
+  return `<p><a href="#/dashboard">${t('backB')}</a></p>${flash}<h1>${t('manage')}: ${esc(p.title)}</h1>
+  <div class="card"><h3 style="margin-top:0">${t('finEntry')}</h3>${docsAI}
+   <form id="finForm" class="f" style="max-width:none" onsubmit="return saveMonth(event,${id})"><label>${t('month')}<input name="month" type="month" required class="ltr"></label>
+   <div class="stats" style="margin:0">${FINF.map(k=>`<label>${t('fl_'+k)}<input name="${k}" type="number" min="0" step="0.01"></label>`).join('')}</div><div><button class="btn">${t('saveMonth')}</button></div></form>
+   <details style="margin-top:10px"><summary class="mut" style="cursor:pointer">${t('csvH')}</summary><p class="mut" style="font-size:.8rem">${t('csvHint')}</p>
+   <form class="f" style="max-width:none" onsubmit="return importCsv(event,${id})"><textarea name="csv" rows="5" class="ltr" placeholder="2026-01,20000,7000,1500,900,4200,1800,600,300,700,200,500,18000"></textarea><div><button class="btn sm">${t('importCsv')}</button></div></form></details>
+   ${a.rows&&a.rows.length?`<div class="tw" style="margin-top:10px"><table><tr><th>${t('month')}</th><th>${t('revenue')}</th><th>${t('profit')}</th><th>${t('verifiedCol')}</th><th></th></tr>${a.series.map(r=>`<tr><td dir="ltr">${r.month}</td><td>${money(r.revenue)}</td><td>${money(r.profit)}</td><td>${r.verified?'✓':''}</td><td><button class="btn ghost sm" onclick="delMonth(${id},'${r.month}')">${t('del')}</button></td></tr>`).join('')}</table></div>`:''}</div>
+  ${analysisHtml(a,{full:false})}
+  ${STATIC||p.status!=='approved'?'':`<div class="two eq" style="margin-top:16px"><div class="card"><h3 style="margin-top:0">${t('publishReport')}</h3>
+   <form class="f" style="max-width:none" onsubmit="return saveReport(event,${id})"><label>${t('month')}<input name="month" type="month" required class="ltr"></label>
+   <label>${t('rSummary')}<textarea name="summary" rows="3" required minlength="10" maxlength="3000"></textarea></label>
+   <label>${t('rSales')}<input name="sales" type="number" min="0" step="0.01"></label><label>${t('rExp')}<input name="expenses" type="number" min="0" step="0.01"></label>
+   <label>${t('rChallenges')}<textarea name="challenges" rows="2" maxlength="2000"></textarea></label><label>${t('rNext')}<textarea name="next" rows="2" maxlength="2000"></textarea></label><button class="btn">${t('publishReport')}</button></form>
+   ${reports.map(r=>`<div class="mut" style="margin-top:6px" dir="ltr">${r.month}</div>`).join('')}</div>
+   <div class="card"><h3 style="margin-top:0">${t('newPoll')}</h3><form class="f" style="max-width:none" onsubmit="return savePoll(event,${id})"><label>${t('pollQ')}<input name="q" required minlength="5" maxlength="300"></label>
+   <label>${t('pollOpts')}<textarea name="opts" rows="3" required></textarea></label><label>${t('pollDays')}<input name="days" type="number" min="1" max="60" value="7"></label><button class="btn">${t('newPoll')}</button></form>
+   ${polls.map(pl=>`<p class="mut">${esc(pl.question)}: ${pl.tally.join(' / ')}</p>`).join('')}
+   <h3>${t('postUpdate')}</h3><form class="f" style="max-width:none;grid-template-columns:1fr auto" onsubmit="return doPost(event,${id})"><input name="b" required maxlength="1500"><button class="btn sm">${t('send')}</button></form>
+   ${posts.filter(x=>x.kind==='question'&&!posts.some(a=>a.parentId===x.id)).map(q=>`<div style="margin-top:8px"><b>${t('kQuestion')}:</b> ${esc(q.body)}<form class="f" style="max-width:none;grid-template-columns:1fr auto" onsubmit="return doPost(event,${id},${q.id})"><input name="b" required maxlength="1500" placeholder="${t('answer')}"><button class="btn sm">${t('send')}</button></form></div>`).join('')}</div></div>`}`;
+}
+function rowFromForm(f){const r={month:f.month.value};FINF.forEach(k=>{r[k]=f[k].value===''?0:+f[k].value});return r}
+async function saveMonth(e,id){e.preventDefault();try{await api('PUT',`/api/projects/${id}/financials`,{rows:[rowFromForm(e.target)]});msg(t('finSaved'))}catch(x){msg(errText(x),1)}render();return false}
+async function importCsv(e,id){e.preventDefault();
+  const rows=e.target.csv.value.split('\n').map(l=>l.trim()).filter(l=>l&&!/^month/i.test(l)).map(l=>{const c=l.split(',').map(x=>x.trim());const r={month:c[0]};FINF.forEach((k,i)=>r[k]=+c[i+1]||0);return r});
+  try{if(!rows.length)throw {code:'bad_input'};await api('PUT',`/api/projects/${id}/financials`,{rows});msg(t('finSaved'))}catch(x){msg(errText(x),1)}render();return false}
+async function delMonth(id,m){try{await api('DELETE',`/api/projects/${id}/financials/${m}`)}catch(x){msg(errText(x),1)}render()}
+async function saveReport(e,id){e.preventDefault();const f=e.target;
+  try{await api('POST',`/api/projects/${id}/reports`,{month:f.month.value,summary:f.summary.value,sales:f.sales.value||undefined,expenses:f.expenses.value||undefined,challenges:f.challenges.value||undefined,nextPlan:f.next.value||undefined});msg(t('reportDone'))}catch(x){msg(errText(x),1)}render();return false}
+async function savePoll(e,id){e.preventDefault();const f=e.target;
+  try{await api('POST',`/api/projects/${id}/polls`,{question:f.q.value,options:f.opts.value.split('\n').map(x=>x.trim()).filter(Boolean),days:+f.days.value});msg(t('saved'))}catch(x){msg(errText(x),1)}render();return false}
+async function aiFill(docId){try{const r=await api('POST',`/api/documents/${docId}/extract`,{});const f=$('#finForm');if(r.month)f.month.value=r.month;FINF.forEach(k=>f[k].value=r[k]||'');msg(t('aiFilled'))}catch(x){msg(errText(x),1)}render()}
+
+/* ----- simulator ----- */
+const SIMF=[['setup','s_setup',30000],['equipment','s_equip',25000],['deposit','s_deposit',5000],['rent','s_rent',2500],['insurance','s_ins',200],['payroll','s_pay',7000],['marketing','s_mkt',800],['otherMonthly','s_oth',600],['rawPct','s_raw',35],['sales','s_sales',30000],['ramp','s_ramp',4],['own','s_own',10000]];
+function vSim(){
+  window._post=simRun;
+  return `<h1>${t('simH')}</h1><p class="mut">${t('simIntro')}</p><div class="two"><form class="card f" id="simForm" style="max-width:none" oninput="simRun()">${SIMF.map(([k,l,d])=>`<label>${t(l)}<input name="${k}" type="number" min="0" step="any" value="${d}"></label>`).join('')}</form><div id="simOut"></div></div><div class="warn">${t('riskNote')}</div>`;
+}
+function simRun(){
+  const f=$('#simForm');if(!f||!window.TWAnalysis)return;const i={};SIMF.forEach(([k])=>i[k]=+f[k].value||0);const r=TWAnalysis.simulateExpansion(i);
+  $('#simOut').innerHTML=`<div class="card"><dl class="kv"><dt>${t('o_total')}</dt><dd>${money(r.total)}</dd><dt>${t('o_fund')}</dt><dd>${money(r.funding)}</dd><dt>${t('o_fixed')}</dt><dd>${money(r.fixed)}</dd><dt>${t('o_be')}</dt><dd>${r.breakEvenSales==null?'—':money(r.breakEvenSales)}</dd></dl>
+  <div class="tw"><table><tr><th></th><th>${t('scSales')}</th><th>${t('scMature')}</th><th>${t('scPayback')}</th><th>${t('sc24')}</th></tr>${r.scenarios.map(s=>`<tr><td>${t('sc_'+s.label)}</td><td>${money(s.sales)}</td><td class="${s.matureProfit>=0?'pos':'neg'}">${money(s.matureProfit)}</td><td>${s.payback?num(s.payback)+' '+t('months'):t('never')}</td><td class="${s.cum24>=0?'pos':'neg'}">${money(s.cum24)}</td></tr>`).join('')}</table></div>
+  ${r.flags.length?`<ul style="color:#b45309">${r.flags.map(x=>`<li>${t('sf_'+x)}</li>`).join('')}</ul>`:''}</div>`;
+}
+
+/* ----- compare ----- */
+async function vCompare(){
+  const ids=cmpGet();if(!ids.length)return `<h1>${t('cmpH')}</h1><div class="card mut">${t('cmpEmpty')}</div>`;
+  const items=(await Promise.all(ids.map(async id=>{try{return {p:await api('GET','/api/projects/'+id),a:await api('GET',`/api/projects/${id}/analysis`)}}catch(e){return null}}))).filter(Boolean);
+  const pc=x=>x==null?'—':num((+x).toFixed(1))+'%';
+  const rows=[['cat',x=>catName(x.p.category)],['cmpGoal',x=>money(x.p.goal)],['risk',x=>riskTag(x.p.risk)],['cmpGrade',x=>x.a.rating?`${x.a.rating.grade} (${num(x.a.rating.score)})`:'—'],['mAvgRev',x=>x.a.metrics?money(x.a.metrics.avgRevenue):'—'],
+    ['mMargin',x=>pc(x.a.metrics&&x.a.metrics.netMargin)],['mGrowth',x=>pc(x.a.metrics&&x.a.metrics.growthPerMonth)],['mSafety',x=>pc(x.a.metrics&&x.a.metrics.marginOfSafety)],['mLiab',x=>x.a.metrics?money(x.a.metrics.liabilities):'—'],
+    ['cmpVal',x=>x.a.valuation?money(x.a.valuation.mid):'—'],['cmpExp',x=>x.p.expectedReturn==null?'—':pc(x.p.expectedReturn)],['duration',x=>x.p.durationMonths?num(x.p.durationMonths)+' '+t('months'):'—'],['cmpFlags',x=>num(x.a.flags.length)]];
+  return `<h1>${t('cmpH')}</h1><div class="card tw"><table><tr><th></th>${items.map(x=>`<th><a href="#/project/${x.p.id}">${esc(x.p.title)}</a><br><a href="#" class="mut" onclick="cmpToggle(${x.p.id});return false">${t('cmpRemove')}</a></th>`).join('')}</tr>
+  ${rows.map(([k,f])=>`<tr><td class="mut">${t(k)}</td>${items.map(x=>`<td>${f(x)}</td>`).join('')}</tr>`).join('')}</table></div><div class="warn">${t('riskNote')}</div>`;
+}
+
+/* ----- market ----- */
+async function vMarket(){
+  if(!me||me.role!=='investor')return `<div class="card mut">${t('needLogin')}</div>`;
+  const l=await api('GET','/api/exits');
+  return `<h1>${t('marketH')}</h1>${flash}<div class="warn">${t('marketNote')}</div><div class="grid">${l.map(e=>`<div class="card"><h3 style="margin-top:0"><a href="#/project/${e.projectId}">${esc(e.project)}</a></h3>
+  <dl class="kv"><dt>${t('shares')}</dt><dd>${num(e.shares)}</dd><dt>${t('pricePS')}</dt><dd>${money(e.pricePerShare)}</dd><dt>${t('faceV')}</dt><dd>${money(e.faceValue)}</dd><dt>${t('total')}</dt><dd>${money(e.total)}</dd></dl>
+  <form class="f" style="max-width:none" onsubmit="return buyListing(event,${e.id})">${signHtml()}<button class="btn">${t('buyListing')}</button></form></div>`).join('')||`<div class="card mut">${t('noListings')}</div>`}</div>`;
+}
+async function buyListing(e,id){e.preventDefault();try{await api('POST',`/api/exits/${id}/buy`,{accept:e.target.querySelector('#acc').checked,signature:e.target.querySelector('#sig').value});await loadMe();msg(t('bought2'))}catch(x){msg(errText(x),1)}render();return false}
+
+/* ----- account ----- */
+async function vAccount(){
+  if(!me)return '';
+  const inv=me.role==='investor',[contracts,exits,complaints,dash]=await Promise.all([api('GET','/api/contracts').catch(()=>[]),inv?api('GET','/api/exits/mine').catch(()=>[]):[],api('GET','/api/complaints/mine').catch(()=>[]),inv?api('GET','/api/investor/dashboard').catch(()=>({holdings:[]})):{holdings:[]}]);
+  const opt=(v,l,c)=>`<option value="${v}" ${c===v?'selected':''}>${l}</option>`;
+  return `<h1>${t('accountH')}</h1>${flash}
+  ${inv?`<div class="card" style="margin-bottom:16px"><h3 style="margin-top:0">${t('profileH')}</h3><form class="f" style="max-width:none;grid-template-columns:1fr 1fr auto;align-items:end" onsubmit="return saveProfile(event)">
+   <label>${t('riskTol')}<select name="rt">${['low','medium','high'].map(r=>opt(r,t('r_'+r),me.riskTolerance)).join('')}</select></label>
+   <label>${t('experience')}<select name="ex">${['beginner','intermediate','expert'].map(r=>opt(r,t('ex_'+r),me.experience)).join('')}</select></label><button class="btn">${t('save')}</button></form></div>`:''}
+  <div class="card" style="margin-bottom:16px"><h3 style="margin-top:0">${t('secH')}</h3>${me.totp?`<p>${t('secOn')}</p><form class="f" style="max-width:none;grid-template-columns:1fr 1fr auto;align-items:end" onsubmit="return disable2fa(event)">
+   <label>${t('pass')}<input name="pw" type="password" required></label><label>${t('code')}<input name="code" required maxlength="6" class="ltr"></label><button class="btn ghost">${t('secDisable')}</button></form>`:`<div id="tfa"><button class="btn" onclick="setup2fa()">${t('secSetup')}</button></div>`}</div>
+  <div class="card" style="margin-bottom:16px"><h3 style="margin-top:0">${t('vault')}</h3>${contracts.length?`<table><tr><th>${t('project')}</th><th>${t('type')}</th><th>${t('shares')}</th><th>${t('amount')}</th><th>${t('date')}</th><th></th></tr>${contracts.map(c=>`<tr><td>${esc(c.project)}</td><td>${t(c.kind==='primary'?'cPrimary':'cSecondary')}</td><td>${num(c.shares)}</td><td>${money(c.amount)}</td><td>${fdate(c.created)}</td><td><a href="#/contract/${c.id}">${t('open2')}</a></td></tr>`).join('')}</table>`:`<p class="mut">${t('noContracts')}</p>`}</div>
+  ${inv?`<div class="card" style="margin-bottom:16px"><h3 style="margin-top:0">${t('exitH')}</h3>${exits.map(e=>`<div class="row" style="border-top:1px solid var(--line);padding:6px 0"><span>${esc(e.project)} · ${num(e.shares)} × ${money(e.pricePerShare)}</span><span>${badgeX(e.status)} ${['pending','open'].includes(e.status)?`<button class="btn ghost sm" onclick="cancelExit(${e.id})">${t('cancel')}</button>`:''}</span></div>`).join('')}
+   ${dash.holdings.length?`<h4>${t('listShares')}</h4><form class="f" style="max-width:none;grid-template-columns:2fr 1fr 1fr auto;align-items:end" onsubmit="return listExit(event)"><label>${t('project')}<select name="pid">${dash.holdings.map(h=>`<option value="${h.id}">${esc(h.title)} (${num(h.shares)})</option>`).join('')}</select></label>
+   <label>${t('shares')}<input name="sh" type="number" min="1" required></label><label>${t('pricePS')}<input name="pr" type="number" min="0.01" step="0.01" required></label><button class="btn">${t('listShares')}</button></form>`:''}<p class="mut" style="font-size:.8rem">${t('marketNote')}</p></div>`:''}
+  <div class="card"><h3 style="margin-top:0">${t('complH')}</h3><form class="f" style="max-width:none" onsubmit="return sendComplaint(event)"><label>${t('subject')}<input name="s" required minlength="3" maxlength="150"></label><label>${t('body')}<textarea name="b" rows="3" required minlength="10" maxlength="3000"></textarea></label><div><button class="btn">${t('send')}</button></div></form>
+   ${complaints.map(c=>`<div style="border-top:1px solid var(--line);padding:8px 0;margin-top:8px"><b>${esc(c.subject)}</b> <span class="risk st-${c.status==='open'?'pending':'approved'}">${t('cs_'+c.status)}</span><p class="mut" style="margin:2px 0">${esc(c.body)}</p>${c.reply?`<p style="margin:2px 0"><b>${t('reply')}:</b> ${esc(c.reply)}</p>`:''}</div>`).join('')}</div>`;
+}
+const badgeX=s=>`<span class="risk ${s==='sold'||s==='open'?'st-approved':s==='pending'?'st-pending':'st-rejected'}">${T['st_'+s]?t('st_'+s):T['s_'+s]?t('s_'+s):s}</span>`;
+async function saveProfile(e){e.preventDefault();try{await api('PUT','/api/profile',{riskTolerance:e.target.rt.value,experience:e.target.ex.value});await loadMe();msg(t('profSaved'))}catch(x){msg(errText(x),1)}render();return false}
+async function setup2fa(){try{const r=await api('POST','/api/2fa/setup',{});$('#tfa').innerHTML=`<p>${t('secSecret')}</p><p class="ltr" style="font-size:1.1rem;font-weight:700;letter-spacing:2px;word-break:break-all">${r.secret}</p>
+  <form class="f" style="max-width:none;grid-template-columns:1fr auto;align-items:end" onsubmit="return enable2fa(event)"><label>${t('code')}<input name="code" required maxlength="6" class="ltr"></label><button class="btn">${t('secEnable')}</button></form>`}catch(x){msg(errText(x),1);render()}}
+async function enable2fa(e){e.preventDefault();try{await api('POST','/api/2fa/enable',{code:e.target.code.value});await loadMe();msg(t('secDone'))}catch(x){msg(errText(x),1)}render();return false}
+async function disable2fa(e){e.preventDefault();try{await api('POST','/api/2fa/disable',{password:e.target.pw.value,code:e.target.code.value});await loadMe();msg(t('secOff'))}catch(x){msg(errText(x),1)}render();return false}
+async function listExit(e){e.preventDefault();const f=e.target;try{await api('POST','/api/exits',{projectId:+f.pid.value,shares:+f.sh.value,pricePerShare:+f.pr.value});msg(t('listed2'))}catch(x){msg(errText(x),1)}render();return false}
+async function cancelExit(id){try{await api('DELETE','/api/exits/'+id)}catch(x){msg(errText(x),1)}render()}
+async function sendComplaint(e){e.preventDefault();try{await api('POST','/api/complaints',{subject:e.target.s.value,body:e.target.b.value});msg(t('compSent'))}catch(x){msg(errText(x),1)}render();return false}
+
+/* ----- notifications ----- */
+let unread=0;
+async function loadUnread(){if(STATIC||!me){unread=0;return}try{unread=(await api('GET','/api/notifications')).filter(n=>!n.read).length}catch(e){unread=0}}
+function notifText(n){const d=n.data||{};return t('n_'+n.type,esc(n.project||''),n.type==='report'?d.month:money(d.amount||0),d.note||'')}
+async function vNotifs(){
+  const l=await api('GET','/api/notifications');
+  return `<div class="row"><h1>${t('notifH')}</h1><button class="btn ghost sm" onclick="readAll()">${t('markRead')}</button></div><div class="card">${l.map(n=>`<div style="padding:8px 0;border-top:1px solid var(--line);${n.read?'opacity:.6':'font-weight:600'}">${n.projectId?`<a href="#/project/${n.projectId}">${notifText(n)}</a>`:notifText(n)} <span class="mut" style="font-weight:400">· ${fdate(n.created)}</span></div>`).join('')||`<p class="mut">${t('noNotif')}</p>`}</div>`;
+}
+async function readAll(){try{await api('POST','/api/notifications/read',{})}catch(e){}unread=0;render()}
+
+/* ----- academy & recommendations ----- */
+function vAcademy(){return `<h1>${t('acH')}</h1><div class="grid">${[1,2,3,4,5,6].map(i=>`<div class="card"><h3 style="margin-top:0">${t('ac'+i+'t')}</h3><p>${t('ac'+i)}</p></div>`).join('')}</div><div class="warn">${t('riskNote')}</div>`}
+async function recsHtml(){
+  if(STATIC||!me||me.role!=='investor')return '';
+  try{const d=await api('GET','/api/investor/dashboard'),held=new Set(d.holdings.map(h=>h.id)),heldCats=new Set(homeList.filter(p=>held.has(p.id)).map(p=>p.category));
+    const rank={low:1,medium:2,high:3},tol=rank[me.riskTolerance||'medium'];
+    const sc=p=>(p.risk&&rank[p.risk]===tol?3:p.risk&&rank[p.risk]<tol?1:0)+(heldCats.has(p.category)?0:2)+(p.sold/p.totalShares>.5?1:0);
+    const l=homeList.filter(p=>!held.has(p.id)&&p.sold<p.totalShares).sort((a,b)=>sc(b)-sc(a)).slice(0,3);
+    return l.length?`<h2>${t('recH')}</h2><p class="mut">${t('recWhy')}</p><div class="grid">${l.map(projectCard).join('')}</div>`:''}catch(e){return ''}
+}
+
 /* ---------- admin ---------- */
 let adminTab='overview';
 function setTab(x){adminTab=x;render()}
 const badge=s=>`<span class="risk st-${s}">${t('s_'+s)}</span>`;
 async function vAdmin(){
-  const tabs=[['overview','tOverview'],['kyc','tKyc'],['apps','tApps'],['wd','tWd'],['users','tUsers'],['tx','tTx'],['audit','tAudit']];
+  const tabs=[['overview','tOverview'],['kyc','tKyc'],['apps','tApps'],['wd','tWd'],['users','tUsers'],['tx','tTx'],['exits','tExits'],['comp','tComp'],['audit','tAudit']];
   let body='';
   if(adminTab==='overview'){
     const o=await api('GET','/api/admin/overview');
@@ -608,12 +934,22 @@ async function vAdmin(){
     body=l.map(p=>`<div class="card" style="margin-bottom:12px"><div class="row"><h3 style="margin:0">${esc(p.title)} ${badge(p.status)} ${riskTag(p.risk)}</h3><a href="#/project/${p.id}">${t('publicPage')}</a></div>
      <p class="mut">${esc(p.ownerName)} · <span class="ltr">${esc(p.ownerEmail)}</span> · ${catName(p.category)} · ${t('goal')} ${money(p.goal)} · ${money(p.sharePrice)} ${t('perShare')}</p>
      <p>${esc(p.description)}</p><div>${docLinks(p.documents)}</div>
+     ${p.analysis&&p.analysis.n?`<div class="card" style="background:#f8fafc;margin:10px 0"><b>${t('anaH')}</b>: ${p.analysis.rating?`${t('rating')} <b>${p.analysis.rating.grade}</b> (${num(p.analysis.rating.score)}) · ${t('sugRisk')}: ${riskTag(p.analysis.rating.suggestedRisk)}`:t('f_thin_data',num(p.analysis.n))}${flagList(p.analysis.flags)}
+      <button class="btn ghost sm" onclick="verifyAll(${p.id},true,'${p.analysis.rows.map(r=>r.month).join(',')}')">${t('verifyAll')}</button> <button class="btn ghost sm" onclick="verifyAll(${p.id},false,'${p.analysis.rows.map(r=>r.month).join(',')}')">${t('unverifyAll')}</button></div>`:`<p class="mut">${t('noFin')}</p>`}
      <form class="f" style="max-width:none;margin-top:10px" onsubmit="return decideProject(event,${p.id})">
       <div class="filters" style="margin:0"><label>${t('decision')}<select name="dec"><option value="approved" ${p.status==='approved'?'selected':''}>${t('approve')}</option><option value="rejected" ${p.status==='rejected'?'selected':''}>${t('reject')}</option></select></label>
       <label>${t('risk')}<select name="risk">${['low','medium','high'].map(r=>`<option value="${r}" ${p.risk===r?'selected':''}>${t('r_'+r)}</option>`).join('')}</select></label></div>
       <label>${t('vNote')}<textarea name="vn" rows="2" maxlength="2000">${esc(p.verificationNote||'')}</textarea></label>
       <label>${t('aNote')}<textarea name="an" rows="2" maxlength="2000">${esc(p.adminNote||'')}</textarea></label>
       <div><button class="btn sm">${t('save')}</button></div></form></div>`).join('')||`<div class="card mut">${t('nothing')}</div>`;
+  }else if(adminTab==='exits'){
+    const l=await api('GET','/api/admin/exits');
+    body=`<div class="card tw"><table><tr><th>${t('project')}</th><th>${t('name')}</th><th>${t('shares')}</th><th>${t('pricePS')}</th><th>${t('faceV')}</th><th>${t('status')}</th><th></th></tr>${l.map(e=>`<tr><td>${esc(e.project)}</td><td>${esc(e.seller)}</td><td>${num(e.shares)}</td><td>${money(e.pricePerShare)}</td><td>${money(e.faceValue)}</td><td>${badgeX(e.status)}</td>
+     <td>${e.status==='pending'?`<button class="btn sm" onclick="decideExit(${e.id},'approved')">${t('approve')}</button> <button class="btn ghost sm" onclick="decideExit(${e.id},'rejected')">${t('reject')}</button>`:''}</td></tr>`).join('')||`<tr><td colspan="7" class="mut">${t('nothing')}</td></tr>`}</table></div>`;
+  }else if(adminTab==='comp'){
+    const l=await api('GET','/api/admin/complaints');
+    body=l.map(c=>`<div class="card" style="margin-bottom:10px"><div class="row"><b>${esc(c.subject)}</b><span>${esc(c.name)} · <span class="risk st-${c.status==='open'?'pending':'approved'}">${t('cs_'+c.status)}</span></span></div><p>${esc(c.body)}</p>
+     ${c.status==='open'?`<form class="f" style="max-width:none;grid-template-columns:1fr auto" onsubmit="return resolveComplaint(event,${c.id})"><input name="r" required maxlength="2000" placeholder="${t('reply')}"><button class="btn sm">${t('resolve')}</button></form>`:`<p class="mut"><b>${t('reply')}:</b> ${esc(c.reply||'')}</p>`}</div>`).join('')||`<div class="card mut">${t('nothing')}</div>`;
   }else if(adminTab==='wd'){
     const l=await api('GET','/api/admin/withdrawals');
     body=`<div class="card tw"><table><tr><th>${t('date')}</th><th>${t('user')}</th><th>${t('wdDest')}</th><th>${t('amount')}</th><th>${t('status')}</th><th></th></tr>
@@ -645,6 +981,9 @@ async function decideProject(e,id){
   catch(x){msg(errText(x),1)}
   render();return false;
 }
+async function verifyAll(id,v,months){try{await api('POST',`/api/admin/projects/${id}/financials/verify`,{months:months.split(','),verified:v});msg(t('saved'))}catch(x){msg(errText(x),1)}render()}
+async function decideExit(id,d){try{await api('POST','/api/admin/exits/'+id,{decision:d});msg(t('saved'))}catch(x){msg(errText(x),1)}render()}
+async function resolveComplaint(e,id){e.preventDefault();try{await api('POST','/api/admin/complaints/'+id,{reply:e.target.r.value});msg(t('saved'))}catch(x){msg(errText(x),1)}render();return false}
 async function decideWd(id,d){
   try{await api('POST','/api/admin/withdrawals/'+id,{decision:d});msg(t('saved'))}catch(x){msg(errText(x),1)}
   render();
@@ -653,23 +992,32 @@ async function decideWd(id,d){
 /* ---------- router ---------- */
 let renderTok=0;
 async function render(){
-  const tok=++renderTok;nav();const h=location.hash||'#/';let html;
+  const tok=++renderTok;await loadUnread();nav();const h=location.hash||'#/';let html;
   try{
     if(h.startsWith('#/project/'))html=await vProject(parseInt(h.split('/')[2])||0);
     else if(h==='#/login')html=me?(go('#/dashboard'),''):vAuth('login');
     else if(h==='#/signup')html=me?(go('#/dashboard'),''):vAuth('signup');
     else if(h==='#/dashboard')html=!me?(go('#/login'),''):me.role==='admin'?await vAdmin():me.role==='owner'?await vOwner():await vInvestor();
+    else if(h.startsWith('#/manage/'))html=me&&me.role==='owner'?await vManage(parseInt(h.split('/')[2])||0):(go('#/login'),'');
+    else if(h.startsWith('#/contract/'))html=me?await vContract(parseInt(h.split('/')[2])||0):(go('#/login'),'');
+    else if(h==='#/simulator')html=vSim();
+    else if(h==='#/compare')html=await vCompare();
+    else if(h==='#/market')html=await vMarket();
+    else if(h==='#/account')html=me?await vAccount():(go('#/login'),'');
+    else if(h==='#/notifications')html=me?await vNotifs():(go('#/login'),'');
+    else if(h==='#/academy')html=vAcademy();
     else if(h==='#/new')html=me&&me.role==='owner'?vNew():(go('#/login'),'');
     else html=await vHome();
   }catch(e){html=`<div class="msg err">${esc(errText(e))}</div>`}
   if(tok!==renderTok)return;
-  $('#app').innerHTML=html;flash='';
+  $('#app').innerHTML=html;flash='';if(window._post){const f=window._post;window._post=null;f()}
   if(!h.startsWith('#/new'))window.scrollTo(0,0);
 }
 window.addEventListener('hashchange',render);
 async function boot(){
   try{const r=await fetch('/api/me',{credentials:'same-origin'});STATIC=!(r.ok&&/json/.test(r.headers.get('content-type')||''))}catch(e){STATIC=true}
   if(STATIC)document.querySelector('header').insertAdjacentHTML('afterend',`<div class="msg" style="margin:0;border-radius:0;text-align:center;font-size:.85rem;background:#fffbeb;color:#92400e">${t('staticNote')}</div>`);
+  if(!STATIC){try{CFG=await api('GET','/api/config')}catch(e){}}
   await loadMe();render();
 }
 applyLang();boot();

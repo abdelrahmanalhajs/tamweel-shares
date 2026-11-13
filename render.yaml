@@ -16,6 +16,9 @@ services:
         sync: false
       - key: ADMIN_PASSWORD
         sync: false
+      # Optional: enables AI document reading + investor assistant (documents/questions are sent to Anthropic's API)
+      - key: ANTHROPIC_API_KEY
+        sync: false
       # Demo top-up button. Remove this line once a real payment provider is connected.
       - key: ALLOW_DEMO_DEPOSIT
         value: "1"
