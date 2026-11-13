@@ -11,6 +11,8 @@ Optional `ANTHROPIC_API_KEY` enables AI document reading and the investor assist
 
 **GitHub Pages / static hosts:** no server, so `index.html` automatically falls back to a **full browser-only simulation** (localStorage) of every feature — admin dashboard, KYC, documents (metadata only), contracts, wallet/withdrawal approval, notifications, community, polls, resale market, 2FA (real TOTP), complaints. Data lives only in that browser and passwords are not protected; use the Node server for anything real.
 
+**See [FEATURES.md](FEATURES.md)** for the full status of every feature in the spec: ✅ works · 🟠 simulated in the demo (needs backend on Render) · ⚪ needs third party/licence. The same list is in the app at `#/features`.
+
 ## Phase 1 — core
 Accounts (scrypt, HttpOnly sessions, rate limits), roles, KYC with document upload, funding applications, admin review/risk rating, search & filters, calculator, wallet with admin-approved withdrawals, audit log, admin reports.
 

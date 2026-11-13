@@ -139,5 +139,42 @@
     return { setup, workingCapital, total, funding, fixed, breakEvenSales, scenarios, flags };
   }
 
-  return { analyze, simulateExpansion, expenses, FIELDS };
+  /* Rule-based "assistant": answers ONLY from the analysis/portfolio data it is given. No investment advice, no guarantees.
+     (A real LLM assistant replaces this on the server when ANTHROPIC_API_KEY is set.) */
+  function assist(q, ctx = {}) {
+    const ar = ctx.lang !== 'en', s = String(q || '').toLowerCase(), a = ctx.analysis, p = ctx.project, m = a && a.metrics, r = a && a.rating;
+    const has = (...w) => w.some(x => s.includes(x));
+    const loc = ar ? 'ar-EG' : 'en-US';
+    const f0 = x => Math.round(x).toLocaleString(loc), f1 = x => (Math.round(x * 10) / 10).toLocaleString(loc);
+    const T = (x, y) => (ar ? x : y);
+    const note = T('\n\n⚠️ هذه معلومات من بيانات المنصة وليست نصيحة استثمارية، ولا توجد أرباح مضمونة.', '\n\n⚠️ Information from platform data only, not investment advice; profits are never guaranteed.');
+    const codes = fl => fl.slice(0, 4).map(x => x.code).join(ar ? '، ' : ', ');
+    let out = '';
+    if (p && (!a || !a.n)) out = T('لا توجد بيانات مالية كافية لهذا المشروع بعد.', 'There is not enough financial data for this project yet.');
+    else if (p && has('خطر', 'مخاطر', 'risk')) out = T('مستوى المخاطرة المعلن: ' + p.risk + '. ' + (r ? 'الدرجة ' + r.score + '/100 (' + r.grade + '). ' : '') + (a.flags.length ? 'عدد التنبيهات: ' + a.flags.length + ' (' + codes(a.flags) + ').' : 'لا توجد تنبيهات.'),
+      'Declared risk: ' + p.risk + '. ' + (r ? 'Score ' + r.score + '/100 (' + r.grade + '). ' : '') + (a.flags.length ? 'Alerts: ' + a.flags.length + ' (' + codes(a.flags) + ').' : 'No alerts.'));
+    else if (p && has('تقييم', 'درجة', 'rating', 'score', 'grade')) {
+      if (!r) out = T('البيانات أقل من 3 شهور فلا يوجد تقييم.', 'Fewer than 3 months of data, so no rating.');
+      else { const w = r.components.slice().sort((x, y) => x.score / x.max - y.score / y.max)[0].key; out = T('الدرجة ' + r.score + '/100 (' + r.grade + '). أضعف عنصر: ' + w + '.', 'Score ' + r.score + '/100 (' + r.grade + '). Weakest component: ' + w + '.'); }
+    }
+    else if (p && has('ربح', 'عائد', 'هامش', 'profit', 'return', 'margin')) out = T('متوسط صافي الربح الشهري ' + f0(m.avgProfit) + '$ وهامش الربح ' + f1(m.netMargin) + '%. العائد المتوقع الذي ذكره المالك (' + (p.expectedReturn ?? '—') + '%) تقدير منه وليس ضمانًا.',
+      'Average monthly net profit $' + f0(m.avgProfit) + ', margin ' + f1(m.netMargin) + '%. The owner\'s expected return (' + (p.expectedReturn ?? '—') + '%) is an estimate, not a guarantee.');
+    else if (p && has('دين', 'مديون', 'التزام', 'debt', 'liabilit')) out = T('الالتزامات الحالية ' + f0(m.liabilities) + '$' + (m.debtRatio != null ? ' أي ' + f1(m.debtRatio * 100) + '% من المبيعات السنوية.' : '.'),
+      'Current liabilities $' + f0(m.liabilities) + (m.debtRatio != null ? ' = ' + f1(m.debtRatio * 100) + '% of annual sales.' : '.'));
+    else if (p && has('تعادل', 'break')) out = m.breakEven ? T('نقطة التعادل الشهرية ≈ ' + f0(m.breakEven) + '$ ومتوسط المبيعات ' + f0(m.avgRevenue) + '$ (هامش الأمان ' + f1(m.marginOfSafety) + '%).',
+      'Monthly break-even ≈ $' + f0(m.breakEven) + ' vs average sales $' + f0(m.avgRevenue) + ' (margin of safety ' + f1(m.marginOfSafety) + '%).') : T('تعذر حساب نقطة التعادل.', 'Break-even could not be computed.');
+    else if (p && has('نمو', 'مبيعات', 'growth', 'sales', 'trend')) out = T('اتجاه المبيعات ' + f1(m.growthPerMonth) + '% شهريًا، ومتوسط المبيعات ' + f0(m.avgRevenue) + '$.', 'Sales trend ' + f1(m.growthPerMonth) + '% per month; average sales $' + f0(m.avgRevenue) + '.');
+    else if (p && has('قيمة', 'تقدير', 'valu', 'worth')) out = a.valuation ? T('تقدير استرشادي للقيمة: من ' + f0(a.valuation.low) + '$ إلى ' + f0(a.valuation.high) + '$ (آلي وليس تقييمًا رسميًا).',
+      'Indicative value: $' + f0(a.valuation.low) + ' – $' + f0(a.valuation.high) + ' (automated, not an appraisal).') : T('لا يوجد تقدير.', 'No estimate available.');
+    else if (p && has('تلاعب', 'احتيال', 'تحذير', 'تنبيه', 'fraud', 'flag', 'alert', 'warning')) out = a.flags.length ? T('التنبيهات: ' + codes(a.flags), 'Alerts: ' + codes(a.flags)) : T('لا توجد تنبيهات حاليًا.', 'No alerts right now.');
+    else if (ctx.portfolio && has('محفظة', 'تنويع', 'portfolio', 'divers', 'concentr')) {
+      const h = ctx.portfolio, tot = h.reduce((x, y) => x + y.invested, 0) || 1, top = h.slice().sort((x, y) => y.invested - x.invested)[0];
+      out = h.length ? T('لديك ' + h.length + ' مشروع/مشروعات بإجمالي ' + f0(tot) + '$. أكبر وزن: ' + top.title + ' (' + f0(top.invested / tot * 100) + '%).' + (top.invested / tot > 0.5 ? ' التركّز مرتفع في مشروع واحد.' : ''),
+        'You hold ' + h.length + ' project(s), $' + f0(tot) + ' in total. Largest: ' + top.title + ' (' + f0(top.invested / tot * 100) + '%).' + (top.invested / tot > 0.5 ? ' Concentration in one project is high.' : '')) : T('ليس لديك استثمارات بعد.', 'You have no investments yet.');
+    } else out = T('أستطيع الإجابة عن: المخاطر، التقييم، الربحية، الديون، نقطة التعادل، نمو المبيعات، القيمة الاسترشادية، التنبيهات، وتنويع محفظتك — بناءً على بيانات المنصة فقط.',
+      'I can answer about: risk, rating, profitability, debt, break-even, growth, indicative value, alerts and portfolio diversification — from platform data only.');
+    return out + note;
+  }
+
+  return { analyze, simulateExpansion, assist, expenses, FIELDS };
 });
