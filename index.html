@@ -61,6 +61,15 @@ th{color:var(--mut);font-weight:600;font-size:.8rem}
 .seg label:has(input:checked){border-color:var(--g);background:#ccfbf1;color:var(--g)}
 .pos{color:#047857;font-weight:700}
 .neg{color:#b91c1c;font-weight:700}
+.risk{display:inline-block;font-size:.75rem;font-weight:700;padding:2px 10px;border-radius:99px;margin-inline-start:6px}
+.risk-low{background:#dcfce7;color:#166534}.risk-medium{background:#fef3c7;color:#92400e}.risk-high{background:#fee2e2;color:#991b1b}.risk-unrated{background:#e2e8f0;color:#475569}
+.st-pending{background:#fef3c7;color:#92400e}.st-approved{background:#dcfce7;color:#166534}.st-rejected{background:#fee2e2;color:#991b1b}.st-paid{background:#dcfce7;color:#166534}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0}.tabs a{padding:7px 14px;border-radius:99px;border:1.5px solid var(--line);background:#fff;font-weight:600;font-size:.88rem;color:var(--ink)}
+.tabs a.on{background:var(--g);color:#fff;border-color:var(--g)}
+.filters{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:10px;margin:0 0 16px}
+@media(max-width:760px){.filters{grid-template-columns:1fr 1fr}}
+.warn{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:10px;padding:10px 14px;font-size:.85rem;margin:12px 0}
+dl.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:10px 0}dl.kv dt{color:var(--mut)}dl.kv dd{margin:0;font-weight:600}
 .ltr{direction:ltr;unicode-bidi:plaintext;text-align:start}
 </style>
 </head>
@@ -156,6 +165,52 @@ const T={
  e_rate_limited:{ar:'محاولات كثيرة، حاول لاحقًا.',en:'Too many attempts, try again later.'},
  e_not_found:{ar:'غير موجود.',en:'Not found.'},
  e_server:{ar:'حدث خطأ في الخادم.',en:'Server error.'},
+ admin:{ar:'مدير',en:'Admin'},
+ phone:{ar:'رقم الهاتف',en:'Phone number'},company:{ar:'اسم الشركة / المشروع (لأصحاب المشروعات)',en:'Company name (project owners)'},
+ kycH:{ar:'التحقق من الهوية (KYC)',en:'Identity verification (KYC)'},kycWhy:{ar:'مطلوب قبل الإيداع أو الاستثمار أو السحب. ارفع صورة بطاقة الهوية (PDF أو PNG أو JPG حتى ٢ ميجابايت).',en:'Required before depositing, investing or withdrawing. Upload your ID (PDF, PNG or JPG, up to 2 MB).'},
+ kycPending:{ar:'طلب التحقق من هويتك قيد المراجعة من الإدارة.',en:'Your identity verification is being reviewed.'},
+ kycRejected:{ar:'تم رفض طلب التحقق. السبب:',en:'Verification was rejected. Reason:'},
+ nationalId:{ar:'الرقم القومي / رقم الهوية',en:'National ID number'},idFile:{ar:'صورة الهوية',en:'ID document'},kycSubmit:{ar:'إرسال للمراجعة',en:'Submit for review'},kycSent:{ar:'تم إرسال طلب التحقق.',en:'Verification request sent.'},
+ kycGate:{ar:'يجب إتمام التحقق من الهوية قبل الاستثمار.',en:'Complete identity verification before investing.'},
+ search:{ar:'ابحث عن مشروع…',en:'Search projects…'},allCats:{ar:'كل القطاعات',en:'All sectors'},allRisk:{ar:'كل المخاطر',en:'Any risk'},
+ anyStatus:{ar:'كل الحالات',en:'Any status'},stOpen:{ar:'متاح للاستثمار',en:'Open'},stFull:{ar:'مكتمل التمويل',en:'Fully funded'},
+ risk:{ar:'المخاطرة',en:'Risk'},r_low:{ar:'منخفضة',en:'Low'},r_medium:{ar:'متوسطة',en:'Medium'},r_high:{ar:'مرتفعة',en:'High'},r_unrated:{ar:'غير مقيّم',en:'Unrated'},
+ minInv:{ar:'الحد الأدنى للاستثمار',en:'Minimum investment'},duration:{ar:'مدة الاستثمار',en:'Investment term'},months:{ar:'شهرًا',en:'months'},
+ projInfo:{ar:'بيانات المشروع',en:'Project details'},location:{ar:'الموقع',en:'Location'},founded:{ar:'سنة التأسيس',en:'Founded'},branches:{ar:'الفروع',en:'Branches'},employees:{ar:'الموظفون',en:'Employees'},
+ mSales:{ar:'المبيعات الشهرية',en:'Monthly sales'},mProfit:{ar:'صافي الربح الشهري',en:'Monthly net profit'},
+ useFunds:{ar:'خطة استخدام التمويل',en:'Use of funds'},profitT:{ar:'آلية توزيع الأرباح',en:'Profit distribution'},exitT:{ar:'شروط التخارج',en:'Exit terms'},
+ verif:{ar:'التحقق من المشروع',en:'Verification'},verifDocs:{ar:'مستندات تمت مراجعتها',en:'Documents on file'},notVerified:{ar:'البيانات المالية أعلاه مقدمة من صاحب المشروع ما لم يُذكر خلاف ذلك.',en:'Figures above are provided by the owner unless stated otherwise.'},
+ riskNote:{ar:'⚠️ الاستثمار ينطوي على مخاطر وقد تخسر جزءًا من رأس المال أو كله. لا توجد أرباح مضمونة، والتقييم ليس ضمانًا للنجاح.',en:'⚠️ Investing involves risk; you may lose part or all of your capital. Profits are not guaranteed and a rating is not a guarantee of success.'},
+ calcH:{ar:'حاسبة الاستثمار',en:'Investment calculator'},calcAmt:{ar:'المبلغ المراد استثماره ($)',en:'Amount to invest ($)'},calcRet:{ar:'العائد السنوي المفترض (%)',en:'Assumed annual return (%)'},calcMon:{ar:'المدة (شهر)',en:'Term (months)'},
+ calcShares:{ar:'عدد الأسهم',en:'Shares'},calcOwn:{ar:'نسبة المشاركة',en:'Ownership'},calcCost:{ar:'التكلفة الفعلية',en:'Actual cost'},
+ scOpt:{ar:'متفائل',en:'Optimistic'},scReal:{ar:'متوسط',en:'Realistic'},scCons:{ar:'متحفظ',en:'Conservative'},scLoss:{ar:'أسوأ حالة',en:'Worst case'},
+ scProfit:{ar:'الربح المحتمل',en:'Possible profit'},scTotal:{ar:'الإجمالي',en:'Total back'},calcWarn:{ar:'افتراضات فقط وليست وعدًا بالأرباح. في أسوأ حالة قد تخسر كامل المبلغ.',en:'Assumptions only, not a promise of profit. In the worst case you can lose the entire amount.'},
+ /* application */
+ applyH:{ar:'طلب تمويل جديد',en:'New funding application'},basic:{ar:'البيانات الأساسية',en:'Basics'},finInfo:{ar:'البيانات المالية والتشغيلية',en:'Financial & operating data'},terms:{ar:'شروط الاستثمار',en:'Investment terms'},
+ foundedIn:{ar:'سنة التأسيس',en:'Year founded'},branchesIn:{ar:'عدد الفروع',en:'Branches'},employeesIn:{ar:'عدد الموظفين',en:'Employees'},
+ mSalesIn:{ar:'متوسط المبيعات الشهرية ($)',en:'Average monthly sales ($)'},mProfitIn:{ar:'متوسط صافي الربح الشهري ($)',en:'Average monthly net profit ($)'},
+ durIn:{ar:'مدة الاستثمار (شهر)',en:'Investment term (months)'},retIn:{ar:'العائد السنوي المتوقع (%) — تقدير وليس ضمانًا',en:'Expected annual return (%) — estimate, not a guarantee'},
+ minSharesIn:{ar:'الحد الأدنى للأسهم',en:'Minimum shares'},submitApp:{ar:'إرسال الطلب للمراجعة',en:'Submit for review'},appSent:{ar:'تم إرسال الطلب. ستراجعه الإدارة بعد رفع المستندات.',en:'Application submitted. Admin will review it after you upload documents.'},
+ status:{ar:'الحالة',en:'Status'},s_pending:{ar:'قيد المراجعة',en:'Under review'},s_approved:{ar:'معتمد',en:'Approved'},s_rejected:{ar:'مرفوض',en:'Rejected'},s_paid:{ar:'تم الدفع',en:'Paid'},
+ adminNote:{ar:'ملاحظات الإدارة',en:'Admin notes'},docs:{ar:'المستندات',en:'Documents'},noDocs:{ar:'لم يتم رفع مستندات بعد.',en:'No documents yet.'},
+ upload:{ar:'رفع مستند',en:'Upload document'},file:{ar:'الملف',en:'File'},kind:{ar:'نوع المستند',en:'Document type'},uploaded:{ar:'تم رفع المستند.',en:'Document uploaded.'},
+ d_kyc_id:{ar:'بطاقة هوية',en:'ID'},d_commercial_register:{ar:'سجل تجاري',en:'Commercial register'},d_tax_card:{ar:'بطاقة ضريبية',en:'Tax card'},d_license:{ar:'ترخيص',en:'License'},
+ d_financials:{ar:'قوائم مالية',en:'Financial statements'},d_bank_statement:{ar:'كشف حساب بنكي',en:'Bank statement'},d_invoice:{ar:'فواتير',en:'Invoices'},d_contract:{ar:'عقود (إيجار/موردين)',en:'Contracts'},
+ d_ownership:{ar:'مستندات ملكية',en:'Ownership docs'},d_payroll:{ar:'كشوف رواتب',en:'Payroll'},d_other:{ar:'أخرى',en:'Other'},
+ /* admin */
+ adminH:{ar:'لوحة إدارة المنصة',en:'Platform admin'},tOverview:{ar:'نظرة عامة',en:'Overview'},tKyc:{ar:'التحقق من الهوية',en:'KYC'},tApps:{ar:'طلبات التمويل',en:'Applications'},
+ tWd:{ar:'طلبات السحب',en:'Withdrawals'},tUsers:{ar:'المستخدمون',en:'Users'},tTx:{ar:'المعاملات',en:'Transactions'},tAudit:{ar:'سجل المراجعة',en:'Audit log'},
+ o_investors:{ar:'المستثمرون',en:'Investors'},o_owners:{ar:'أصحاب المشروعات',en:'Owners'},o_kyc:{ar:'KYC بانتظار المراجعة',en:'KYC pending'},o_pend:{ar:'طلبات بانتظار المراجعة',en:'Applications pending'},
+ o_appr:{ar:'مشروعات معتمدة',en:'Approved projects'},o_rej:{ar:'مشروعات مرفوضة',en:'Rejected projects'},o_raised:{ar:'إجمالي التمويل',en:'Total raised'},o_avg:{ar:'متوسط الاستثمار',en:'Avg. investment'},
+ o_paid:{ar:'إجمالي التوزيعات',en:'Total distributed'},o_wd:{ar:'سحوبات معلّقة',en:'Pending withdrawals'},o_liab:{ar:'إجمالي أرصدة المحافظ',en:'Total wallet balances'},
+ approve:{ar:'اعتماد',en:'Approve'},reject:{ar:'رفض',en:'Reject'},markPaid:{ar:'تم الدفع',en:'Mark paid'},decision:{ar:'القرار',en:'Decision'},
+ vNote:{ar:'ملاحظة التحقق (تظهر للمستثمر)',en:'Verification note (shown to investors)'},aNote:{ar:'ملاحظة داخلية / سبب الرفض',en:'Internal note / rejection reason'},save:{ar:'حفظ',en:'Save'},saved:{ar:'تم الحفظ.',en:'Saved.'},
+ nothing:{ar:'لا يوجد شيء بانتظار المراجعة.',en:'Nothing waiting.'},action:{ar:'الإجراء',en:'Action'},actor:{ar:'المنفّذ',en:'Actor'},user:{ar:'المستخدم',en:'User'},role:{ar:'الدور',en:'Role'},
+ tx_refund:{ar:'استرداد',en:'Refund'},pendingWd:{ar:'سحوبات قيد التنفيذ',en:'Pending withdrawals'},
+ e_kyc_required:{ar:'يجب إتمام التحقق من الهوية أولًا.',en:'Identity verification is required first.'},e_need_document:{ar:'ارفع صورة الهوية أولًا.',en:'Upload your ID document first.'},
+ e_kyc_locked:{ar:'طلب التحقق قيد المراجعة أو معتمد بالفعل.',en:'Verification is already pending or approved.'},e_file_too_large:{ar:'الملف أكبر من ٢ ميجابايت.',en:'File is larger than 2 MB.'},
+ e_bad_file_type:{ar:'نوع الملف غير مدعوم (PDF أو PNG أو JPG فقط).',en:'Unsupported file type (PDF, PNG or JPG only).'},e_too_many_files:{ar:'تم الوصول للحد الأقصى من الملفات.',en:'File limit reached.'},
+ e_below_minimum:{ar:'أقل من الحد الأدنى للاستثمار.',en:'Below the minimum investment.'},e_risk_required:{ar:'حدد مستوى المخاطرة قبل الاعتماد.',en:'Set a risk level before approving.'},
  c_agri:{ar:'زراعة',en:'Agriculture'},c_food:{ar:'أغذية ومشروبات',en:'Food & Drink'},c_energy:{ar:'طاقة',en:'Energy'},
  c_real:{ar:'عقارات',en:'Real Estate'},c_tech:{ar:'تقنية',en:'Technology'},c_retail:{ar:'تجارة',en:'Retail'},c_other:{ar:'أخرى',en:'Other'}
 };
@@ -273,42 +328,82 @@ function nav(){
 async function logout(){try{await api('POST','/api/logout',{})}catch(e){}me=null;go('#/')}
 
 /* ---------- views ---------- */
+function riskTag(r){return `<span class="risk risk-${r||'unrated'}">${t('risk')}: ${t('r_'+(r||'unrated'))}</span>`}
 function projectCard(p){
   const d=p.description;
-  return `<div class="card"><span class="tag">${catName(p.category)}</span><h3>${esc(p.title)}</h3>
+  return `<div class="card"><span class="tag">${catName(p.category)}</span>${p.risk?riskTag(p.risk):''}<h3>${esc(p.title)}</h3>
   <div class="mut">${esc(d.slice(0,90))}${d.length>90?'…':''}</div>
   <div class="prog"><i style="width:${pct(p)}%"></i></div>
   <div class="row"><b>${money(p.raised)}</b><span class="mut">${t('of')} ${money(p.goal)} · ${num(pct(p))}%</span></div>
   <div class="row mut" style="margin:6px 0 12px"><span>${money(p.sharePrice)} ${t('perShare')}</span><span>${num(p.totalShares-p.sold)} ${t('left')}</span></div>
   <a class="btn sm" href="#/project/${p.id}">${t('viewInvest')}</a></div>`;
 }
+let homeList=[],flt={q:'',cat:'',risk:'',st:''};
+function gridHtml(){
+  const q=flt.q.trim().toLowerCase();
+  const l=homeList.filter(p=>(!q||(p.title+' '+p.description).toLowerCase().includes(q))&&(!flt.cat||p.category===flt.cat)&&(!flt.risk||p.risk===flt.risk)
+    &&(!flt.st||(flt.st==='open'?p.sold<p.totalShares:p.sold>=p.totalShares)));
+  return l.map(projectCard).join('')||`<p class="mut">${t('none')}</p>`;
+}
+function setFlt(k,v){flt[k]=v;$('#grid').innerHTML=gridHtml()}
 async function vHome(){
-  const list=await api('GET','/api/projects');
+  homeList=await api('GET','/api/projects');
+  const opt=(v,l,cur)=>`<option value="${v}" ${cur===v?'selected':''}>${l}</option>`;
   return `<div class="hero"><h1>${t('heroH')}</h1><p>${t('heroP')}</p>
   ${me?'':`<a class="btn" href="#/signup">${t('start')}</a>`}</div>
   <div class="steps"><div class="step"><b>${t('s1')}</b>${t('s1d')}</div>
   <div class="step"><b>${t('s2')}</b>${t('s2d')}</div>
   <div class="step"><b>${t('s3')}</b>${t('s3d')}</div></div>
-  <h2>${t('open')}</h2><div class="grid">${list.map(projectCard).join('')||`<p class="mut">${t('none')}</p>`}</div>`;
+  <h2>${t('open')}</h2>
+  <div class="filters"><input type="search" placeholder="${t('search')}" value="${esc(flt.q)}" oninput="setFlt('q',this.value)">
+   <select onchange="setFlt('cat',this.value)">${opt('',t('allCats'),flt.cat)}${CATS.map(c=>opt(c,t('c_'+c),flt.cat)).join('')}</select>
+   <select onchange="setFlt('risk',this.value)">${opt('',t('allRisk'),flt.risk)}${['low','medium','high'].map(r=>opt(r,t('r_'+r),flt.risk)).join('')}</select>
+   <select onchange="setFlt('st',this.value)">${opt('',t('anyStatus'),flt.st)}${opt('open',t('stOpen'),flt.st)}${opt('full',t('stFull'),flt.st)}</select></div>
+  <div class="warn">${t('riskNote')}</div>
+  <div class="grid" id="grid">${gridHtml()}</div>`;
+}
+function calcUpdate(price,total){
+  const amt=+$('#c_amt').value||0,ret=+$('#c_ret').value||0,mon=+$('#c_mon').value||0;
+  const sh=Math.floor(amt/price),cost=sh*price,own=total?sh/total*100:0;
+  const row=(k,r)=>{const pr=cost*r/100*mon/12;return `<tr><td>${t(k)} (${num(r)}%)</td><td class="pos">${money(pr)}</td><td>${money(cost+pr)}</td></tr>`};
+  $('#calcOut').innerHTML=`<dl class="kv"><dt>${t('calcShares')}</dt><dd>${num(sh)}</dd><dt>${t('calcCost')}</dt><dd>${money(cost)}</dd><dt>${t('calcOwn')}</dt><dd>${num(own.toFixed(2))}%</dd></dl>
+  <table><tr><th></th><th>${t('scProfit')}</th><th>${t('scTotal')}</th></tr>${row('scOpt',ret*1.25)}${row('scReal',ret)}${row('scCons',ret*0.5)}
+  <tr><td>${t('scLoss')}</td><td class="neg">−${money(cost)}</td><td>${money(0)}</td></tr></table>`;
 }
 async function vProject(id){
   let p;try{p=await api('GET','/api/projects/'+id)}catch(e){return `<p>${t('notFound')}</p>`}
-  const left=p.totalShares-p.sold;let box;
-  if(!me)box=`<p>${t('needLogin')}</p><a class="btn" href="#/login">${t('login')}</a> <a class="btn ghost" href="#/signup">${t('signup')}</a>`;
-  else if(me.role==='owner')box=`<p class="mut">${t('ownerNote')}</p><a class="btn" href="#/dashboard">${t('openDash')}</a>`;
+  const left=p.totalShares-p.sold,minS=Math.min(p.minShares||1,left);let box;
+  const needKyc=me&&me.role==='investor'&&me.kyc!==undefined&&me.kyc!=='approved';
+  if(p.status&&p.status!=='approved')box=`<p><span class="risk st-${p.status}">${t('s_'+p.status)}</span></p>`;
+  else if(!me)box=`<p>${t('needLogin')}</p><a class="btn" href="#/login">${t('login')}</a> <a class="btn ghost" href="#/signup">${t('signup')}</a>`;
+  else if(me.role!=='investor')box=`<p class="mut">${t('ownerNote')}</p><a class="btn" href="#/dashboard">${t('openDash')}</a>`;
   else if(!left)box=`<p><b>${t('funded')}</b></p>`;
+  else if(needKyc)box=`<div class="warn">${t('kycGate')}</div><a class="btn" href="#/dashboard">${t('kycH')}</a>`;
   else box=`<h3 style="margin-top:0">${t('buyH')}</h3>
    <p class="mut">${t('walletBal')}: <b>${money(me.balance)}</b> · <a href="#/dashboard">${t('wallet')}</a></p>
    <form class="f" onsubmit="return buy(event,${p.id})">
-   <label>${t('qty')} ${num(left)})<input type="number" id="qty" min="1" max="${left}" step="1" value="1" required oninput="$('#cost').textContent=money(this.value*${p.sharePrice})"></label>
-   <div class="row"><span>${t('total')}</span><b id="cost">${money(p.sharePrice)}</b></div>
+   <label>${t('qty')} ${num(left)}, ${t('minInv')}: ${num(minS)})<input type="number" id="qty" min="${minS}" max="${left}" step="1" value="${minS}" required oninput="$('#cost').textContent=money(this.value*${p.sharePrice})"></label>
+   <div class="row"><span>${t('total')}</span><b id="cost">${money(minS*p.sharePrice)}</b></div>
    <button class="btn">${t('confirm')}</button></form>`;
-  return `<p><a href="#/">${t('back')}</a></p>${flash}<div class="two"><div class="card"><span class="tag">${catName(p.category)}</span>
+  const kv=(k,v)=>!v?'':`<dt>${t(k)}</dt><dd>${v}</dd>`;
+  const txt=(k,v)=>v?`<h3>${t(k)}</h3><p style="white-space:pre-line">${esc(v)}</p>`:'';
+  const details=`<h3>${t('projInfo')}</h3><dl class="kv">${kv('location',esc(p.location))}${kv('founded',p.foundedYear&&num(p.foundedYear).replace(/[٬,]/g,''))}${kv('branches',p.branches!=null&&num(p.branches))}${kv('employees',p.employees!=null&&num(p.employees))}
+   ${kv('mSales',p.monthlySales!=null&&money(p.monthlySales))}${kv('mProfit',p.monthlyProfit!=null&&money(p.monthlyProfit))}${kv('duration',p.durationMonths&&num(p.durationMonths)+' '+t('months'))}${kv('minInv',p.minShares>1&&num(p.minShares)+' '+t('sharesW'))}</dl>
+   ${txt('useFunds',p.useOfFunds)}${txt('profitT',p.profitTerms)}${txt('exitT',p.exitTerms)}
+   ${p.status?`<h3>${t('verif')}</h3><p>${riskTag(p.risk)}</p>${p.verificationNote?`<p>${esc(p.verificationNote)}</p>`:''}
+   ${p.verifiedDocs&&p.verifiedDocs.length?`<p class="mut">${t('verifDocs')}: ${p.verifiedDocs.map(k=>t('d_'+k)).join('، ')}</p>`:''}<p class="mut">${t('notVerified')}</p>`:''}`;
+  const calc=(p.status&&p.status!=='approved')?'':`<div class="card" style="margin-top:16px"><h3 style="margin-top:0">${t('calcH')}</h3>
+   <div class="stats" style="margin-top:6px"><label>${t('calcAmt')}<input type="number" id="c_amt" min="0" step="1" value="${minS*p.sharePrice}" oninput="calcUpdate(${p.sharePrice},${p.totalShares})"></label>
+   <label>${t('calcRet')}<input type="number" id="c_ret" step="0.5" value="${p.expectedReturn??15}" oninput="calcUpdate(${p.sharePrice},${p.totalShares})"></label>
+   <label>${t('calcMon')}<input type="number" id="c_mon" min="1" step="1" value="${p.durationMonths||12}" oninput="calcUpdate(${p.sharePrice},${p.totalShares})"></label></div>
+   <div id="calcOut"></div><div class="warn">${t('calcWarn')}</div></div>`;
+  setTimeout(()=>{if($('#c_amt'))calcUpdate(p.sharePrice,p.totalShares)},0);
+  return `<p><a href="#/">${t('back')}</a></p>${flash}<div class="two"><div><div class="card"><span class="tag">${catName(p.category)}</span>${p.risk?riskTag(p.risk):''}
   <h1 style="margin:8px 0">${esc(p.title)}</h1><p class="mut">${t('by')} ${esc(p.owner)} · ${t('listed')} ${fdate(p.created)}</p><p>${esc(p.description)}</p>
   <div class="prog"><i style="width:${pct(p)}%"></i></div>
   <div class="stats"><div class="stat"><small>${t('raised')}</small><b>${money(p.raised)}</b></div><div class="stat"><small>${t('goal')}</small><b>${money(p.goal)}</b></div>
-  <div class="stat"><small>${t('sharePrice')}</small><b>${money(p.sharePrice)}</b></div><div class="stat"><small>${t('sharesLeft')}</small><b>${num(left)}/${num(p.totalShares)}</b></div></div></div>
-  <div class="card">${box}</div></div>`;
+  <div class="stat"><small>${t('sharePrice')}</small><b>${money(p.sharePrice)}</b></div><div class="stat"><small>${t('sharesLeft')}</small><b>${num(left)}/${num(p.totalShares)}</b></div></div>${details}</div>${calc}</div>
+  <div><div class="card">${box}</div><div class="warn">${t('riskNote')}</div></div></div>`;
 }
 async function buy(e,id){
   e.preventDefault();const q=parseInt($('#qty').value);
@@ -321,6 +416,7 @@ function vAuth(mode){
   <form class="f" onsubmit="return ${su?'doSignup':'doLogin'}(event)" style="max-width:none">
   ${su?`<div class="seg"><label><input type="radio" name="role" value="investor" checked>${t('wantInvest')}</label><label><input type="radio" name="role" value="owner">${t('ownProject')}</label></div>
   <label>${t('fullName')}<input id="name" required maxlength="80" autocomplete="name"></label>`:''}
+  ${su?`<label>${t('phone')}<input id="phone" type="tel" class="ltr" autocomplete="tel" maxlength="20"></label><label>${t('company')}<input id="company" maxlength="120"></label>`:''}
   <label>${t('email')}<input id="email" type="email" required class="ltr" autocomplete="email"></label>
   <label>${t('pass')}<input id="pass" type="password" required minlength="${su?8:1}" class="ltr" autocomplete="${su?'new-password':'current-password'}"></label>
   <button class="btn">${su?t('signup'):t('login')}</button></form>
@@ -328,7 +424,7 @@ function vAuth(mode){
 }
 async function doSignup(e){
   e.preventDefault();
-  try{await api('POST','/api/signup',{name:$('#name').value,email:$('#email').value,password:$('#pass').value,role:document.querySelector('[name=role]:checked').value});
+  try{await api('POST','/api/signup',{name:$('#name').value,phone:$('#phone').value||undefined,company:$('#company').value||undefined,email:$('#email').value,password:$('#pass').value,role:document.querySelector('[name=role]:checked').value});
    await loadMe();flash='';go('#/dashboard')}catch(x){msg(errText(x),1);render()}
   return false;
 }
@@ -339,13 +435,45 @@ async function doLogin(e){
   return false;
 }
 
+/* KYC + documents */
+function readB64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=rej;r.readAsDataURL(file)})}
+function kycCard(){
+  if(!me||me.kyc===undefined||me.kyc==='approved')return '';
+  if(me.kyc==='pending')return `<div class="msg">${t('kycPending')}</div>`;
+  return `<div class="card" style="margin:12px 0"><b>${t('kycH')}</b>${me.kyc==='rejected'?`<div class="msg err">${t('kycRejected')} ${esc(me.kycNote||'')}</div>`:''}
+  <p class="mut">${t('kycWhy')}</p><form class="f" style="max-width:none" onsubmit="return doKyc(event)">
+  <label>${t('fullName')}<input name="fn" required value="${esc(me.name)}" maxlength="100"></label>
+  <label>${t('nationalId')}<input name="nid" required class="ltr" maxlength="20"></label>
+  <label>${t('phone')}<input name="ph" required class="ltr" maxlength="20" value="${esc(me.phone||'')}"></label>
+  <label>${t('idFile')}<input name="file" type="file" accept=".pdf,.png,.jpg,.jpeg" required></label>
+  <button class="btn">${t('kycSubmit')}</button></form></div>`;
+}
+async function doKyc(e){
+  e.preventDefault();const f=e.target,file=f.file.files[0];
+  try{
+    if(file.size>2*1024*1024)throw {code:'file_too_large'};
+    await api('POST','/api/documents',{kind:'kyc_id',filename:file.name,data:await readB64(file)});
+    await api('POST','/api/kyc',{fullName:f.fn.value,nationalId:f.nid.value,phone:f.ph.value});
+    await loadMe();msg(t('kycSent'));
+  }catch(x){msg(errText(x),1)}
+  render();return false;
+}
+async function uploadDoc(e,pid){
+  e.preventDefault();const f=e.target,file=f.file.files[0];if(!file)return false;
+  try{if(file.size>2*1024*1024)throw {code:'file_too_large'};
+    await api('POST','/api/documents',{kind:f.kind.value,filename:file.name,data:await readB64(file),projectId:pid});msg(t('uploaded'))}
+  catch(x){msg(errText(x),1)}
+  render();return false;
+}
+const docLinks=l=>l.length?l.map(d=>`<a href="/api/documents/${d.id}" target="_blank" rel="noopener">${t('d_'+d.kind)}: ${esc(d.filename)}</a>`).join('<br>'):`<span class="mut">${t('noDocs')}</span>`;
+
 /* investor dashboard + wallet */
 async function vInvestor(){
   const d=await api('GET','/api/investor/dashboard');
   const invested=d.holdings.reduce((a,h)=>a+h.invested,0);
   const incomes=d.history.filter(h=>h.type==='income');
-  return `<h1>${t('hello')} ${esc(me.name)}</h1>${flash}
-  <div class="two eq">
+  return `<h1>${t('hello')} ${esc(me.name)}</h1>${flash}${kycCard()}
+  ${d.pendingWithdrawals?`<div class="warn">${t('pendingWd')}: ${money(d.pendingWithdrawals)}</div>`:''}<div class="two eq">
    <div class="card wallet"><div class="mut">${t('available')}</div><div class="big">${money(d.balance)}</div>
     <p class="mut" style="font-size:.8rem;margin-bottom:0">${t('demoWallet')}</p></div>
    <div class="card"><b>${t('withdrawH')}</b>
@@ -391,18 +519,26 @@ async function vOwner(){
   <div class="row"><h2 style="margin:8px 0">${t('myProjects')}</h2><a class="btn" href="#/new">${t('newProj')}</a></div>
   ${mine.map(ownerProject).join('')||`<div class="card mut">${t('noOwn')}</div>`}`;
 }
+const DOCK=['commercial_register','tax_card','license','financials','bank_statement','invoice','contract','ownership','payroll','other'];
 function ownerProject(p){
-  return `<div class="card" style="margin-bottom:16px"><div class="row"><h3 style="margin:0">${esc(p.title)}</h3><a href="#/project/${p.id}">${t('publicPage')}</a></div>
+  const st=p.status||'approved';
+  const docs=p.documents!==undefined?`<div style="margin-top:12px"><b>${t('docs')}</b><div style="margin:6px 0">${docLinks(p.documents)}</div>
+   <form class="f" style="max-width:none;grid-template-columns:1fr 1.4fr auto;align-items:end" onsubmit="return uploadDoc(event,${p.id})">
+   <label>${t('kind')}<select name="kind">${DOCK.map(k=>`<option value="${k}">${t('d_'+k)}</option>`).join('')}</select></label>
+   <label>${t('file')}<input name="file" type="file" accept=".pdf,.png,.jpg,.jpeg" required></label><button class="btn sm">${t('upload')}</button></form></div>`:'';
+  return `<div class="card" style="margin-bottom:16px"><div class="row"><h3 style="margin:0">${esc(p.title)} <span class="risk st-${st}">${t('s_'+st)}</span> ${p.risk&&st==='approved'?riskTag(p.risk):''}</h3><a href="#/project/${p.id}">${t('publicPage')}</a></div>
+  ${p.adminNote?`<div class="warn"><b>${t('adminNote')}:</b> ${esc(p.adminNote)}</div>`:''}
   <div class="prog"><i style="width:${pct(p)}%"></i></div>
   <div class="row"><b>${money(p.raised)} ${t('raisedLow')}</b><span class="mut">${t('goal')} ${money(p.goal)} · ${num(p.sold)}/${num(p.totalShares)} ${t('sold')}</span></div>
+  ${docs}
   <div class="two" style="margin-top:14px"><div><b>${t('investors')}</b>${p.investors.length?`<div class="tw"><table><tr><th>${t('name')}</th><th>${t('shares')}</th><th>${t('amount')}</th><th>${t('pctCol')}</th></tr>
   ${p.investors.map(r=>`<tr><td>${esc(r.name)}</td><td>${num(r.shares)}</td><td>${money(r.amount)}</td><td>${num((r.shares/p.sold*100).toFixed(1))}%</td></tr>`).join('')}</table></div>`:`<p class="mut">${t('noInv')}</p>`}
   ${p.payouts.length?`<p style="margin-bottom:4px"><b>${t('payHist')}</b></p>${p.payouts.map(x=>`<div class="row mut"><span>${fdate(x.date)}${x.note?' · '+esc(x.note):''}</span><span>${money(x.amount)}</span></div>`).join('')}`:''}</div>
-  <div><b>${t('shareInc')}</b><form class="f" style="margin-top:8px" onsubmit="return payout(event,${p.id})">
+  ${st==='approved'?`<div><b>${t('shareInc')}</b><form class="f" style="margin-top:8px" onsubmit="return payout(event,${p.id})">
   <label>${t('amtDist')}<input type="number" min="0.01" step="0.01" name="amt" required></label>
   <label>${t('note')}<input name="note" maxlength="120" placeholder="${t('notePh')}"></label>
   <button class="btn" ${p.sold?'':'disabled'}>${t('distBtn')}</button></form>
-  <p class="mut" style="font-size:.8rem">${t('distNote')}</p></div></div></div>`;
+  <p class="mut" style="font-size:.8rem">${t('distNote')}</p></div>`:''}</div></div>`;
 }
 async function payout(e,id){
   e.preventDefault();const f=e.target,amt=parseFloat(f.amt.value);
@@ -411,25 +547,108 @@ async function payout(e,id){
   render();return false;
 }
 function vNew(){
-  return `<p><a href="#/dashboard">${t('backB')}</a></p>${flash}<div class="card" style="max-width:560px"><h2 style="margin-top:0">${t('newH')}</h2>
+  const n=(name,label,extra='')=>`<label>${label}<input type="number" name="${name}" ${extra}></label>`;
+  const ta=(name,label,max=2000)=>`<label>${label}<textarea name="${name}" rows="3" maxlength="${max}"></textarea></label>`;
+  return `<p><a href="#/dashboard">${t('backB')}</a></p>${flash}<div class="card" style="max-width:640px"><h2 style="margin-top:0">${t('applyH')}</h2>
   <form class="f" style="max-width:none" onsubmit="return createProject(event)">
+  <h3 style="margin:0">${t('basic')}</h3>
   <label>${t('pname')}<input name="title" required minlength="3" maxlength="120"></label>
   <label>${t('cat')}<select name="cat">${CATS.map(c=>`<option value="${c}">${t('c_'+c)}</option>`).join('')}</select></label>
   <label>${t('desc')}<textarea name="desc" rows="4" required minlength="10" maxlength="3000" placeholder="${t('descPh')}"></textarea></label>
+  <label>${t('location')}<input name="location" maxlength="120"></label>
+  <h3 style="margin:8px 0 0">${t('finInfo')}</h3>
+  ${n('founded',t('foundedIn'),'min="1900" max="2100"')}${n('branches',t('branchesIn'),'min="0"')}${n('employees',t('employeesIn'),'min="0"')}
+  ${n('msales',t('mSalesIn'),'min="0" step="0.01"')}${n('mprofit',t('mProfitIn'),'min="0" step="0.01"')}
+  <h3 style="margin:8px 0 0">${t('terms')}</h3>
   <label>${t('goalIn')}<input type="number" name="goal" min="100" step="1" required></label>
   <label>${t('priceIn')}<input type="number" name="price" min="1" step="1" required></label>
-  <p class="mut" id="calc"></p><button class="btn">${t('publish')}</button></form></div>`;
+  <p class="mut" id="calc"></p>
+  ${n('minShares',t('minSharesIn'),'min="1" step="1" value="1"')}${n('dur',t('durIn'),'min="1" max="600"')}${n('ret',t('retIn'),'step="0.5" min="-100" max="500"')}
+  ${ta('uses',t('useFunds'))}${ta('profitT',t('profitT'))}${ta('exitT',t('exitT'))}
+  <div class="warn">${t('riskNote')}</div>
+  <button class="btn">${t('submitApp')}</button></form></div>`;
 }
 async function createProject(e){
-  e.preventDefault();const f=e.target;
-  try{await api('POST','/api/projects',{title:f.title.value,category:f.cat.value,description:f.desc.value,goal:+f.goal.value,sharePrice:+f.price.value});
-   msg(t('published'));go('#/dashboard')}catch(x){msg(errText(x),1);render()}
+  e.preventDefault();const f=e.target,v=n=>f[n].value.trim()||undefined,nn=n=>f[n].value===''?undefined:+f[n].value;
+  try{await api('POST','/api/projects',{title:f.title.value,category:f.cat.value,description:f.desc.value,goal:+f.goal.value,sharePrice:+f.price.value,
+    location:v('location'),foundedYear:nn('founded'),branches:nn('branches'),employees:nn('employees'),monthlySales:nn('msales'),monthlyProfit:nn('mprofit'),
+    minShares:nn('minShares'),durationMonths:nn('dur'),expectedReturn:nn('ret'),useOfFunds:v('uses'),profitTerms:v('profitT'),exitTerms:v('exitT')});
+   msg(t(STATIC?'published':'appSent'));go('#/dashboard')}catch(x){msg(errText(x),1);render()}
   return false;
 }
 document.addEventListener('input',e=>{
   const f=e.target.form;if(f&&f.goal&&f.price&&$('#calc')){const g=+f.goal.value,p=+f.price.value;
    $('#calc').textContent=g&&p?t('calc',num(Math.floor(g/p))):''}
 });
+
+/* ---------- admin ---------- */
+let adminTab='overview';
+function setTab(x){adminTab=x;render()}
+const badge=s=>`<span class="risk st-${s}">${t('s_'+s)}</span>`;
+async function vAdmin(){
+  const tabs=[['overview','tOverview'],['kyc','tKyc'],['apps','tApps'],['wd','tWd'],['users','tUsers'],['tx','tTx'],['audit','tAudit']];
+  let body='';
+  if(adminTab==='overview'){
+    const o=await api('GET','/api/admin/overview');
+    const st=(k,v)=>`<div class="stat"><small>${t(k)}</small><b>${v}</b></div>`;
+    body=`<div class="stats">${st('o_investors',num(o.investors))}${st('o_owners',num(o.owners))}${st('o_kyc',num(o.kycPending))}${st('o_pend',num(o.projectsPending))}
+    ${st('o_appr',num(o.projectsApproved))}${st('o_rej',num(o.projectsRejected))}${st('o_raised',money(o.totalRaised))}${st('o_avg',money(o.avgInvestment))}
+    ${st('o_paid',money(o.totalPaidOut))}${st('o_wd',num(o.withdrawalsPending))}${st('o_liab',money(o.walletLiability))}</div>`;
+  }else if(adminTab==='kyc'){
+    const l=await api('GET','/api/admin/kyc');
+    body=l.map(u=>`<div class="card" style="margin-bottom:12px"><div class="row"><b>${esc(u.name)}</b><span class="mut ltr">${esc(u.email)}</span></div>
+     <dl class="kv"><dt>${t('nationalId')}</dt><dd class="ltr">${esc(u.national_id)}</dd><dt>${t('phone')}</dt><dd class="ltr">${esc(u.phone)}</dd></dl>
+     <p>${docLinks(u.documents)}</p>
+     <form class="f" style="max-width:none;grid-template-columns:1fr auto auto;align-items:end" onsubmit="return decideKyc(event,${u.id})">
+     <label>${t('aNote')}<input name="note" maxlength="500"></label>
+     <button class="btn sm" name="d" value="approved" onclick="this.form.dec='approved'">${t('approve')}</button>
+     <button class="btn ghost sm" name="d" value="rejected" onclick="this.form.dec='rejected'">${t('reject')}</button></form></div>`).join('')||`<div class="card mut">${t('nothing')}</div>`;
+  }else if(adminTab==='apps'){
+    const l=await api('GET','/api/admin/projects');
+    body=l.map(p=>`<div class="card" style="margin-bottom:12px"><div class="row"><h3 style="margin:0">${esc(p.title)} ${badge(p.status)} ${riskTag(p.risk)}</h3><a href="#/project/${p.id}">${t('publicPage')}</a></div>
+     <p class="mut">${esc(p.ownerName)} · <span class="ltr">${esc(p.ownerEmail)}</span> · ${catName(p.category)} · ${t('goal')} ${money(p.goal)} · ${money(p.sharePrice)} ${t('perShare')}</p>
+     <p>${esc(p.description)}</p><div>${docLinks(p.documents)}</div>
+     <form class="f" style="max-width:none;margin-top:10px" onsubmit="return decideProject(event,${p.id})">
+      <div class="filters" style="margin:0"><label>${t('decision')}<select name="dec"><option value="approved" ${p.status==='approved'?'selected':''}>${t('approve')}</option><option value="rejected" ${p.status==='rejected'?'selected':''}>${t('reject')}</option></select></label>
+      <label>${t('risk')}<select name="risk">${['low','medium','high'].map(r=>`<option value="${r}" ${p.risk===r?'selected':''}>${t('r_'+r)}</option>`).join('')}</select></label></div>
+      <label>${t('vNote')}<textarea name="vn" rows="2" maxlength="2000">${esc(p.verificationNote||'')}</textarea></label>
+      <label>${t('aNote')}<textarea name="an" rows="2" maxlength="2000">${esc(p.adminNote||'')}</textarea></label>
+      <div><button class="btn sm">${t('save')}</button></div></form></div>`).join('')||`<div class="card mut">${t('nothing')}</div>`;
+  }else if(adminTab==='wd'){
+    const l=await api('GET','/api/admin/withdrawals');
+    body=`<div class="card tw"><table><tr><th>${t('date')}</th><th>${t('user')}</th><th>${t('wdDest')}</th><th>${t('amount')}</th><th>${t('status')}</th><th></th></tr>
+     ${l.map(w=>`<tr><td>${fdate(w.created)}</td><td>${esc(w.name)}</td><td class="ltr">${esc(w.destination)}</td><td>${money(w.amount)}</td><td>${badge(w.status)}</td>
+     <td>${w.status==='pending'?`<button class="btn sm" onclick="decideWd(${w.id},'paid')">${t('markPaid')}</button> <button class="btn ghost sm" onclick="decideWd(${w.id},'rejected')">${t('reject')}</button>`:''}</td></tr>`).join('')||`<tr><td colspan="6" class="mut">${t('nothing')}</td></tr>`}</table></div>`;
+  }else if(adminTab==='users'){
+    const l=await api('GET','/api/admin/users');
+    body=`<div class="card tw"><table><tr><th>${t('name')}</th><th>${t('email')}</th><th>${t('role')}</th><th>KYC</th><th>${t('date')}</th></tr>
+     ${l.map(u=>`<tr><td>${esc(u.name)}</td><td class="ltr">${esc(u.email)}</td><td>${t(u.role)}</td><td>${u.role==='admin'?'':badge(u.kyc_status==='none'?'pending':u.kyc_status)+(u.kyc_status==='none'?'<span class="mut"> —</span>':'')}</td><td>${fdate(u.created)}</td></tr>`).join('')}</table></div>`;
+  }else if(adminTab==='tx'){
+    const l=await api('GET','/api/admin/transactions');
+    body=`<div class="card tw"><table><tr><th>${t('date')}</th><th>${t('user')}</th><th>${t('type')}</th><th>${t('project')}</th><th>${t('amount')}</th></tr>
+     ${l.map(x=>`<tr><td>${fdate(x.date)}</td><td>${esc(x.user)}</td><td>${t('tx_'+x.type)}</td><td>${esc(x.project||'')}</td><td class="${x.amount>=0?'pos':'neg'}" dir="ltr">${x.amount>=0?'+':'−'}${money(Math.abs(x.amount))}</td></tr>`).join('')}</table></div>`;
+  }else{
+    const l=await api('GET','/api/admin/audit');
+    body=`<div class="card tw"><table><tr><th>${t('date')}</th><th>${t('actor')}</th><th>${t('action')}</th><th>${t('note')}</th></tr>
+     ${l.map(a=>`<tr><td>${new Date(a.created).toLocaleString(loc())}</td><td>${esc(a.actor||'—')}</td><td class="ltr">${esc(a.action)} · ${esc(a.entity)}#${a.entity_id??''}</td><td class="ltr mut">${esc(a.detail||'')}</td></tr>`).join('')}</table></div>`;
+  }
+  return `<h1>${t('adminH')}</h1>${flash}<div class="tabs">${tabs.map(([k,l])=>`<a href="#/dashboard" class="${adminTab===k?'on':''}" onclick="setTab('${k}');return false">${t(l)}</a>`).join('')}</div>${body}`;
+}
+async function decideKyc(e,id){
+  e.preventDefault();const f=e.target;
+  try{await api('POST','/api/admin/kyc/'+id,{decision:f.dec,note:f.note.value||undefined});msg(t('saved'))}catch(x){msg(errText(x),1)}
+  render();return false;
+}
+async function decideProject(e,id){
+  e.preventDefault();const f=e.target;
+  try{await api('POST',`/api/admin/projects/${id}/review`,{decision:f.dec.value,risk:f.risk.value,verificationNote:f.vn.value||undefined,adminNote:f.an.value||undefined});msg(t('saved'))}
+  catch(x){msg(errText(x),1)}
+  render();return false;
+}
+async function decideWd(id,d){
+  try{await api('POST','/api/admin/withdrawals/'+id,{decision:d});msg(t('saved'))}catch(x){msg(errText(x),1)}
+  render();
+}
 
 /* ---------- router ---------- */
 let renderTok=0;
@@ -439,7 +658,7 @@ async function render(){
     if(h.startsWith('#/project/'))html=await vProject(parseInt(h.split('/')[2])||0);
     else if(h==='#/login')html=me?(go('#/dashboard'),''):vAuth('login');
     else if(h==='#/signup')html=me?(go('#/dashboard'),''):vAuth('signup');
-    else if(h==='#/dashboard')html=!me?(go('#/login'),''):me.role==='owner'?await vOwner():await vInvestor();
+    else if(h==='#/dashboard')html=!me?(go('#/login'),''):me.role==='admin'?await vAdmin():me.role==='owner'?await vOwner():await vInvestor();
     else if(h==='#/new')html=me&&me.role==='owner'?vNew():(go('#/login'),'');
     else html=await vHome();
   }catch(e){html=`<div class="msg err">${esc(errText(e))}</div>`}

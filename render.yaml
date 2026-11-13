@@ -11,6 +11,11 @@ services:
         value: "1"
       - key: DB_PATH
         value: /data/tamweel.db
+      # Create the first admin account on boot (set both in the Render dashboard; password >= 10 chars)
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
       # Demo top-up button. Remove this line once a real payment provider is connected.
       - key: ALLOW_DEMO_DEPOSIT
         value: "1"

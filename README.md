@@ -1,27 +1,25 @@
 # Tamweel Shares (تمويل شيرز)
 
-Crowdfunding with shares. Arabic (default, RTL) + English.
-Node 22.5+ and SQLite (built in) — **no npm dependencies**.
-
-On a static host (e.g. GitHub Pages) there is no server, so the same page runs in a **browser-only demo mode** (data in localStorage, banner shown). With the Node server it uses the real database.
+Investment crowdfunding platform: owners apply for funding, admins verify and rate projects, verified investors buy shares and withdraw their income. Arabic (default, RTL) + English. Node 22.5+ and built-in SQLite — **no npm dependencies**.
 
 ## Run locally
 ```bash
-npm run dev      # seeds demo accounts (owner@demo.com / investor@demo.com, password demo12345)
-# open http://localhost:3000
+npm run dev   # seeds demo data. Logins (password demo12345): admin@demo.com, owner@demo.com, investor@demo.com
 ```
-Without `SEED_DEMO=1` the database starts empty (use this for production: `npm start`).
+Production: `ADMIN_EMAIL=you@x.com ADMIN_PASSWORD='long-password' NODE_ENV=production npm start` (creates the first admin; database starts empty).
 
-## What's inside
-- Accounts: scrypt-hashed passwords, random session tokens (stored hashed) in an HttpOnly + SameSite cookie, login rate limiting, JSON-only mutations, security headers.
-- SQLite database (`data/tamweel.db`, override with `DB_PATH`). Money is stored as integer cents; buying, payouts and withdrawals run in transactions.
-- Investor wallet: income from payouts is credited to the wallet; investors buy shares from the wallet and can withdraw the balance.
-- Owners: create projects, track funds/investors, distribute income by shares.
+On a static host (GitHub Pages) there is no server, so the page falls back to a **browser-only demo mode** (localStorage). Admin, KYC and document upload exist only with the Node server.
 
-## Before real money
-- `/api/wallet/deposit` is a **demo top-up** (disabled when `NODE_ENV=production` unless `ALLOW_DEMO_DEPOSIT=1`). Connect a payment provider for real deposits.
-- Withdrawals are **recorded** only; paying them out to a bank needs a provider/manual process and an admin review step.
-- Add email verification & password reset, HTTPS (set by your host), backups of the DB volume, and legal/licensing review for selling shares.
+## Implemented (Phase 1 of the spec)
+- **Accounts & security:** scrypt passwords, hashed session tokens in HttpOnly/SameSite cookies, login rate limiting, JSON-only API, security headers, roles (investor / owner / admin).
+- **KYC:** investors submit ID data + document; admin approves/rejects. Required before deposit, invest, withdraw.
+- **Funding applications:** owners submit a detailed application (financials, terms, use of funds), upload documents (PDF/PNG/JPG ≤ 2 MB, type-checked, private); admin reviews, sets risk rating + verification note, approves/rejects. Only approved projects are public.
+- **Marketplace:** search + filters (sector, risk, status), project details, risk disclosure, investment calculator (optimistic / realistic / conservative / worst case — assumptions only, never guaranteed).
+- **Wallet:** income credited automatically; withdrawals are requests that an admin marks paid or rejects (rejection refunds the wallet).
+- **Admin dashboard:** overview/report, KYC queue, applications, withdrawals, users, transactions, audit log (who did what, when).
+
+## Not built yet (from the spec)
+OTP/2FA, e-signed contracts, OCR/AI analysis & fraud detection, expansion simulator, monthly reports & notifications, fund-utilization tracking, investor community/voting, exit/secondary market, real payment & escrow integration. Selling shares to the public needs Egyptian regulatory licensing (e.g. FRA) and licensed escrow before real money.
 
 ## Deploy
-`Dockerfile` included; mount a persistent volume at `/data`.
+`Dockerfile` + `render.yaml` included (persistent disk at `/data` for the database and uploaded documents).
