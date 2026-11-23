@@ -76,6 +76,7 @@ dl.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:10px 0}dl.
 <body>
 <header><div class="bar" id="nav"></div></header>
 <main id="app"></main>
+<footer id="foot" class="warn" style="max-width:960px;margin:24px auto;font-size:.8rem;line-height:1.7"></footer>
 
 <script src="analysis.js"></script>
 <script>
@@ -152,6 +153,10 @@ const T={
  txH:{ar:'سجل المحفظة',en:'Wallet history'},noTx:{ar:'لا توجد عمليات بعد.',en:'No transactions yet.'},
  tx_deposit:{ar:'إيداع',en:'Deposit'},tx_invest:{ar:'استثمار',en:'Investment'},tx_income:{ar:'دخل',en:'Income'},tx_withdraw:{ar:'سحب',en:'Withdrawal'},
  type:{ar:'النوع',en:'Type'},
+ footDisc:{ar:'محتوى تعليمي وتوضيحي فقط، وليس نصيحة استثمارية أو مالية. الاستثمار في المشاريع الصغيرة ينطوي على مخاطر قد تصل إلى خسارة رأس المال، والأداء السابق لا يضمن عوائد مستقبلية.',en:'Educational and illustrative content only — not investment or financial advice. Investing in small businesses carries risk, including loss of capital; past performance does not guarantee future returns.'},
+ footSrcLive:{ar:'مصدر البيانات: بيانات المنصة التي يدخلها أصحاب المشاريع ويراجعها المشرفون. آخر تحديث: %1',en:'Data source: platform data entered by project owners and reviewed by admins. Last updated: %1'},
+ footSrcNone:{ar:'مصدر البيانات: بيانات المنصة. لا توجد سجلات بعد.',en:'Data source: platform data. No records yet.'},
+ footSrcDemo:{ar:'مصدر البيانات: بيانات تجريبية مُحاكاة داخل متصفحك، وليست أسعارًا أو عوائد حقيقية.',en:'Data source: simulated demo data stored in your browser — not real prices or returns.'},
  staticNote:{ar:'نسخة تجريبية كاملة: كل الخدمات (الإدارة، التحقق، العقود، السوق الثانوي…) تعمل محاكاةً داخل متصفحك فقط. الحسابات: admin@demo.com / owner@demo.com / investor@demo.com — كلمة المرور demo12345',en:'Full demo: every service (admin, KYC, contracts, resale market…) is simulated inside your browser only. Accounts: admin@demo.com / owner@demo.com / investor@demo.com — password demo12345'},
  demoWallet:{ar:'نسخة تجريبية: لا توجد بوابة دفع حقيقية، والسحب يُسجَّل فقط.',en:'Demo: no real payment gateway; withdrawals are only recorded.'},
  /* errors */
@@ -350,6 +355,12 @@ const T={
 function t(k,...a){let s=(T[k]||{})[lang]||k;a.forEach((v,i)=>s=s.replace('%'+(i+1),v));return s}
 const CATS=['agri','food','energy','real','tech','retail','other'];
 function setLang(l){lang=l;try{localStorage.setItem('tw_lang',l)}catch(e){}applyLang();render()}
+function footer(){
+  const el=document.getElementById('foot');if(!el)return;
+  const u=(typeof CFG==='object'&&CFG.dataUpdated)?new Date(CFG.dataUpdated).toLocaleString(lang==='ar'?'ar-EG':'en-GB'):'';
+  const src=STATIC?t('footSrcDemo'):(u?t('footSrcLive',u):t('footSrcNone'));
+  el.innerHTML=`<div>${t('footDisc')}</div><div style="margin-top:6px;opacity:.85">${src}</div>`;
+}
 function applyLang(){document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr'}
 
 /* ---------- static (no-server) mode ----------
@@ -492,7 +503,7 @@ async function staticApi(method,url,body){
     S.session=u.id;return done({ok:true})}
   if(url==='/api/logout'){S.session=null;return done({ok:true})}
   if(url==='/api/me')return{user:cur?meOut(cur):null};
-  if(url==='/api/config')return{ai:false};
+  if(url==='/api/config')return{ai:false,dataUpdated:null};
   /* ---- kyc & documents ---- */
   if(url==='/api/documents'&&method==='POST'){const u=need();if(u.role==='admin')throw sErr('forbidden');
     const kinds=['kyc_id','commercial_register','tax_card','license','financials','bank_statement','invoice','contract','ownership','payroll','other'];
@@ -1436,7 +1447,7 @@ async function render(){
     else html=await vHome();
   }catch(e){html=`<div class="msg err">${esc(errText(e))}</div>`}
   if(tok!==renderTok)return;
-  $('#app').innerHTML=html;flash='';if(window._post){const f=window._post;window._post=null;f()}
+  footer();$('#app').innerHTML=html;flash='';if(window._post){const f=window._post;window._post=null;f()}
   if(!h.startsWith('#/new'))window.scrollTo(0,0);
 }
 window.addEventListener('hashchange',render);

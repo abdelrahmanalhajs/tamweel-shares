@@ -797,7 +797,11 @@ route('POST', /^\/api\/wallet\/withdraw$/, (req, res, ctx) => {
   limit('wd:' + u.id, 10, 60 * 60_000);
   return { balance: dollars(withdraw(u, cents(ctx.body.amount), str(ctx.body.destination, 4, 100))) };
 });
-route('GET', /^\/api\/config$/, () => ({ ai: AI_ON }));
+route('GET', /^\/api\/config$/, () => {
+  // Real timestamp of the newest platform record (never invented): latest project, financial statement or audit event.
+  const r = db.prepare('SELECT MAX(m) AS m FROM (SELECT MAX(created) AS m FROM projects UNION ALL SELECT MAX(updated) FROM financials UNION ALL SELECT MAX(created) FROM audit)').get();
+  return { ai: AI_ON, dataUpdated: (r && r.m) || null };
+});
 route('GET', /^\/api\/projects\/(\d+)\/analysis$/, (req, res, ctx) => {
   const pid = Number(ctx.m[1]);
   const p = db.prepare('SELECT status,owner_id FROM projects WHERE id=?').get(pid);
